@@ -1,0 +1,214 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>plot_bananas.m - Plot a surface of the coverage and the slice map for each subject,</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-06-21"><meta name="DC.source" content="plot_bananas.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>plot_bananas.m - Plot a surface of the coverage and the slice map for each subject,</h1><!--introduction--><p>write out a .nii brik of the banana coverage plot the banana spheres</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Plot some of the banana spheres</a></li><li><a href="#2">plot an image of the coverage density for every slice</a></li><li><a href="#3">Write out banana briks</a></li></ul></div><h2>Plot some of the banana spheres<a name="1"></a></h2><pre class="codeinput">plot_single_bananas(1,1,10000);
+</pre><pre class="codeoutput">Attempt to reference field of non-structure array.
+
+Error in plot_single_bananas (line 25)
+        scatter3(loc.recd(1,:,i_banana,isub),loc.recd(2,:,i_banana,isub),loc.recd(3,:,i_banana,isub),loc.recd(4,:,i_banana,isub)*sphere_scale);
+
+Error in plot_bananas (line 6)
+plot_single_bananas(1,1,10000);
+</pre><h2>plot an image of the coverage density for every slice<a name="2"></a></h2><pre class="codeinput"><span class="keyword">if</span> prm.modeltype == 2 <span class="comment">%phys</span>
+    <span class="keyword">if</span> prm.idata == 2 <span class="comment">%phase</span>
+        thresh = [-1000 1000];
+    <span class="keyword">else</span> <span class="comment">%acdc</span>
+        thresh = [0 2500];
+    <span class="keyword">end</span>
+<span class="keyword">else</span> <span class="comment">%geo</span>
+    thresh = [0 5];
+<span class="keyword">end</span>
+isothresh = 1;
+<span class="comment">% new_map = colormap('Jet'); close;</span>
+<span class="comment">% new_map(1,:) = 0*ones(1,3);</span>
+
+<span class="keyword">for</span> i_sub = 1:prm.nsubj
+
+    <span class="comment">% Plot the thresholded surface of the coverage map</span>
+    figure; isosurface(look.coverage_slices(:,:,:,i_sub),isothresh);
+    axis(gca,<span class="string">'vis3d'</span>);
+
+    final_image = zeros(1000,3000);
+    <span class="keyword">for</span> i_mapdir = 1:3
+        <span class="keyword">for</span> i=1:96
+            row = floor((i-1)/10)*100;
+            col = mod(i-1,10)*100+(i_mapdir-1)*1000;
+            <span class="keyword">switch</span> i_mapdir
+                <span class="keyword">case</span> 1
+                    final_image(row+1:row+1+95,col+1:col+1+95) = squeeze(look.coverage_slices(i,:,:,i_sub));
+                <span class="keyword">case</span> 2
+                    final_image(row+1:row+1+95,col+1:col+1+95) = squeeze(look.coverage_slices(:,i,:,i_sub));
+                <span class="keyword">case</span> 3
+                    final_image(row+1:row+1+95,col+1:col+1+95) = squeeze(look.coverage_slices(:,:,i,i_sub));
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+   figure; imagesc(final_image,thresh); axis <span class="string">image</span>; axis <span class="string">off</span>;
+        set(gca,<span class="string">'YDir'</span>,<span class="string">'normal'</span>);
+
+    <span class="keyword">if</span> i_sub == 1
+        image_sum = final_image;
+    <span class="keyword">else</span>
+        image_sum = (image_sum + final_image);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%plot mean over all subjects</span>
+figure; imagesc(image_sum./prm.nsubj,thresh); axis <span class="string">image</span>; axis <span class="string">off</span>;
+set(gca,<span class="string">'YDir'</span>,<span class="string">'normal'</span>);
+</pre><h2>Write out banana briks<a name="3"></a></h2><p>get an old .nii 4D file</p><pre class="codeinput">orig_mri_hdr = spm_vol(<span class="string">'opt3d_template.nii'</span>);
+orig_mri_img = spm_read_vols(orig_mri_hdr);
+brik = look.coverage_slices(:,:,:,1);
+<span class="comment">% write a structural brik</span>
+nhdr = orig_mri_hdr;
+nimg = brik;
+nhdr.dim = size(brik);
+nhdr.descrip = <span class="string">'Opt3d LightPath Banana Density'</span>;
+nhdr.fname = <span class="string">'Opt3dBananaBrik.nii'</span>;
+nhdr.pinfo = [1;0;0];
+nhdr.mat = [-1.000   0.000   0.000   128.000;   <span class="comment">%Talairach coordinates??? (This is the Ttarg coordinates of orig.mgz in freesurfer</span>
+             0.000   0.000   1.000  -128.000;
+             0.000  -1.000   0.000   128.000;
+             0.000   0.000   0.000   1.000];
+spm_write_vol(nhdr,nimg);
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% plot_bananas.m - Plot a surface of the coverage and the slice map for each subject,
+% write out a .nii brik of the banana coverage
+% plot the banana spheres
+
+%% Plot some of the banana spheres
+plot_single_bananas(1,1,10000);
+
+%% plot an image of the coverage density for every slice
+
+if prm.modeltype == 2 %phys
+    if prm.idata == 2 %phase
+        thresh = [-1000 1000];
+    else %acdc
+        thresh = [0 2500];
+    end
+else %geo
+    thresh = [0 5];
+end
+isothresh = 1;
+% new_map = colormap('Jet'); close;
+% new_map(1,:) = 0*ones(1,3);
+
+for i_sub = 1:prm.nsubj
+    
+    % Plot the thresholded surface of the coverage map
+    figure; isosurface(look.coverage_slices(:,:,:,i_sub),isothresh);
+    axis(gca,'vis3d');
+        
+    final_image = zeros(1000,3000);
+    for i_mapdir = 1:3
+        for i=1:96
+            row = floor((i-1)/10)*100;
+            col = mod(i-1,10)*100+(i_mapdir-1)*1000;
+            switch i_mapdir 
+                case 1
+                    final_image(row+1:row+1+95,col+1:col+1+95) = squeeze(look.coverage_slices(i,:,:,i_sub));
+                case 2
+                    final_image(row+1:row+1+95,col+1:col+1+95) = squeeze(look.coverage_slices(:,i,:,i_sub));
+                case 3
+                    final_image(row+1:row+1+95,col+1:col+1+95) = squeeze(look.coverage_slices(:,:,i,i_sub));
+            end
+        end
+    end
+   figure; imagesc(final_image,thresh); axis image; axis off;
+        set(gca,'YDir','normal');
+        
+    if i_sub == 1
+        image_sum = final_image;
+    else
+        image_sum = (image_sum + final_image);
+    end
+end
+%plot mean over all subjects
+figure; imagesc(image_sum./prm.nsubj,thresh); axis image; axis off;
+set(gca,'YDir','normal');
+
+
+%% Write out banana briks
+ % get an old .nii 4D file
+orig_mri_hdr = spm_vol('opt3d_template.nii');
+orig_mri_img = spm_read_vols(orig_mri_hdr);
+brik = look.coverage_slices(:,:,:,1);
+% write a structural brik
+nhdr = orig_mri_hdr;
+nimg = brik;
+nhdr.dim = size(brik);
+nhdr.descrip = 'Opt3d LightPath Banana Density';
+nhdr.fname = 'Opt3dBananaBrik.nii';
+nhdr.pinfo = [1;0;0];
+nhdr.mat = [-1.000   0.000   0.000   128.000;   %Talairach coordinates??? (This is the Ttarg coordinates of orig.mgz in freesurfer
+             0.000   0.000   1.000  -128.000;
+             0.000  -1.000   0.000   128.000;
+             0.000   0.000   0.000   1.000];
+spm_write_vol(nhdr,nimg);
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,555 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>readloc.m - Read the .loc file that is read by opt3d, and create the bananas</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-06-21"><meta name="DC.source" content="readloc.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>readloc.m - Read the .loc file that is read by opt3d, and create the bananas</h1><!--introduction--><pre>Dr. Kyle Mathewson - Translation of Gabriele Gratton's opt3d_fast_v2.f90
+This subroutine gets the information about the locations of the sources and detectors for each subject, and determine the 3-D
+locations associated with each channel.  The 3-D locations are determined as a series of equidistant points along a semicircular
+arch between the source and the detector.
+In the present implementation, the locations can be expressed in Talairach coordinates.
+Each source or detector location is identified by a label.
+This routine uses a file (suggested extension: .loc) in which the following info needs to be provided:
+      first row:                   name of a VMI file where an anatomical image is stored
+      second row:                  name of a TAI file where eight reference points are stored (see Talairach routine)
+      third row:           number of sources and number of detectors
+EDIT THIS
+      a row for each subject with: (a) a value (+1 or -1) that will inidcate whether the left to right dimension needs to be inverted
+                                   (b) the extended name (including path) of the file where the montage is described
+                                   (c) the extended name (including path) of the .ELP file where the digitized location of each source
+                                       and detector are stored (this also includes the appropriate labels)
+                                   (d) the extended name (including path) of a file where the EMSE coordinates of the eight points
+                                       used for the Talairach transformation are stored
+The montage file is a file made up of one row for each channel.
+This row contains the labels for the source and detector locations, the wavelength, and the modulation frequency.</pre><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">setup workspace and define function</a></li><li><a href="#3">setup progress bar</a></li><li><a href="#4">setup head/banana shape models???</a></li><li><a href="#5">set channel wavelength to its default value = 0</a></li><li><a href="#6">load montage information for .loc file</a></li><li><a href="#7">load MRI data</a></li><li><a href="#8">Read coordinates of each location for each subject</a></li></ul></div><h2>setup workspace and define function<a name="1"></a></h2><pre class="codeinput"><span class="keyword">function</span> readloc(fname_loc)
+</pre><pre class="codeinput"><span class="keyword">global</span> prm maxprm loc coordinates <span class="comment">%cosines sines fname_mtg mrifile taifile mtglabel labels montage   detector dummy  fname1 fnametai infomsg curr_labels  prop sourcex surfcoord voxf voxs;</span>
+</pre><h2>setup progress bar<a name="3"></a></h2><pre class="codeinput">plural = <span class="string">'s'</span>;
+<span class="keyword">if</span> prm.nsubj == 1
+    plural = <span class="string">''</span>;
+<span class="keyword">end</span>
+progressbar([<span class="string">'Reading '</span> num2str(prm.nsubj) <span class="string">' Subject''s Locations'</span>], <span class="keyword">...</span>
+            <span class="string">'Channel Locations'</span>);
+</pre><img vspace="5" hspace="5" src="readloc_01.png" alt=""> <h2>setup head/banana shape models???<a name="4"></a></h2><pre class="codeinput"><span class="keyword">for</span> i=0:9
+    sines(i+1)=sin((i).*3.14159./10.);
+    cosines(i+1)=0.5.*(1.-cos((i).*3.14159./10.));
+<span class="keyword">end</span>
+</pre><h2>set channel wavelength to its default value = 0<a name="5"></a></h2><pre class="codeinput">loc.iwave = zeros(maxprm.knc,maxprm.kns);
+</pre><h2>load montage information for .loc file<a name="6"></a></h2><pre class="codeinput">fid_loc = fopen(fname_loc,<span class="string">'r'</span>);
+[mrifile]=fgetl(fid_loc);
+[taifile]=fgetl(fid_loc);
+nsources=fscanf(fid_loc,<span class="string">'%g'</span>,1);
+ndets=fscanf(fid_loc,<span class="string">'%g'</span>,1);
+dum = fgetl(fid_loc);
+</pre><pre class="codeoutput">Error using readloc (line 44)
+Not enough input arguments.
+</pre><h2>load MRI data<a name="7"></a></h2><pre>    loadmri(mrifile,taifile);</pre><h2>Read coordinates of each location for each subject<a name="8"></a></h2><pre class="codeinput"><span class="keyword">for</span> isub=1:prm.nsubj <span class="comment">%for each subject</span>
+    fprintf([<span class="string">'Sub '</span> num2str(isub) <span class="string">'. '</span>]);
+
+    <span class="comment">% set default modulation frequency</span>
+    <span class="keyword">for</span> j=1:maxprm.knc
+        loc.xmf(j,isub)=1.;
+    <span class="keyword">end</span>
+
+    i_direct=fgetl(fid_loc);
+    fname_mtg=fgetl(fid_loc);
+
+    <span class="comment">% read montage file</span>
+    fid_mtg = fopen(fname_mtg,<span class="string">'r'</span>);
+    mtglabel=fgetl(fid_mtg);
+
+    <span class="comment">%setup the number of channels???</span>
+    <span class="keyword">if</span> prm.nchans&lt;=96
+        prm.nch(isub)=prm.nchans.*prm.nses;
+    <span class="keyword">else</span>
+        <span class="keyword">for</span> j=1:prm.nses
+            prm.nchses(j,isub)=fscanf(fid_mtg,<span class="string">'%g'</span>,1);
+        <span class="keyword">end</span>
+        prm.nch(isub)=0;
+        <span class="keyword">for</span> j=1:prm.nses;
+            prm.nch(isub)=prm.nch(isub)+prm.nchses(j,isub);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">%actually read the file</span>
+    <span class="keyword">for</span> j=1:prm.nch(isub)
+        inch(1,j,isub)=fscanf(fid_mtg,<span class="string">'%g'</span>,1);
+        inch(2,j,isub)=fscanf(fid_mtg,<span class="string">'%g'</span>,1);
+        montage{1,j}=fscanf(fid_mtg,<span class="string">'%s'</span>,1);
+        montage{2,j}=fscanf(fid_mtg,<span class="string">'%s'</span>,1);
+        iwavexx=fscanf(fid_mtg,<span class="string">'%g'</span>,1);
+        xmfxx=fscanf(fid_mtg,<span class="string">'%g'</span>,1);
+        <span class="comment">% fix these values for the rest of program</span>
+        <span class="keyword">if</span> iwavexx==690
+            loc.iwave(j,isub)=1;
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> iwavexx==830
+            loc.iwave(j,isub)=2;
+        <span class="keyword">end</span>
+        loc.xmf(j,isub)=xmfxx./110.;
+    <span class="keyword">end</span>
+    fclose(fid_mtg);
+
+    <span class="comment">%open .tol file for that subject</span>
+    fname_tol=fgetl(fid_loc);
+    fid_tol = fopen(fname_tol,<span class="string">'r'</span>);
+    ilocations=nsources+ndets;
+
+    <span class="comment">%fix if there are more than one source or detector accross montages</span>
+    <span class="comment">%in a single locations</span>
+    temp_line =<span class="string">'xx'</span>;
+    line_count = 0;
+    <span class="keyword">while</span> temp_line~= -1
+        temp_line = fgetl(fid_tol);
+        line_count = line_count+1;
+    <span class="keyword">end</span>
+    <span class="keyword">if</span> line_count &lt; ilocations
+        ilocations = line_count-1;
+    <span class="keyword">end</span>
+    fclose(fid_tol);
+
+    fid_tol = fopen(fname_tol,<span class="string">'r'</span>);
+    coordinates = zeros(3,ilocations);
+
+    <span class="comment">% if TOL data</span>
+    iline=0;
+    <span class="keyword">for</span> j=1:ilocations
+        labels{j}=fscanf(fid_tol,<span class="string">'%s'</span>,1);
+        coordinates(2,j)=str2num(fscanf(fid_tol,<span class="string">'%s'</span>,1));
+        coordinates(1,j)=fscanf(fid_tol,<span class="string">'%g'</span>,1);
+        coordinates(3,j)=fscanf(fid_tol,<span class="string">'%g'</span>,1);
+        iline=iline+1;
+        <span class="keyword">for</span> k=1:3
+            <span class="comment">% transform coordinates in cm</span>
+            coordinates(k,j)=coordinates(k,j).*0.1;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    fclose(fid_tol);
+    ilocations=iline;
+
+    <span class="comment">% determine source and detector locations</span>
+    <span class="keyword">for</span> ichan=1:prm.nch(isub) <span class="comment">%for each channel</span>
+
+        sourcex=0;
+        detector=0;
+        <span class="keyword">for</span> k=1:ilocations <span class="comment">%for each helmet location</span>
+            curr_labels=labels(k);
+            <span class="keyword">if</span> strcmp(deblank(montage(1,ichan)),deblank(curr_labels))
+                sourcex=k;
+            <span class="keyword">end</span>
+            <span class="keyword">if</span> strcmp(deblank(montage(2,ichan)),deblank(curr_labels))
+                detector=k;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="keyword">if</span> isub==1
+            <span class="keyword">if</span> sourcex==0||detector==0
+                infomsg=sprintf([<span class="string">'%s'</span>,<span class="string">'%3i'</span>],<span class="string">' Source or detector not found for channel '</span>,ichan);
+                fprintf([infomsg <span class="string">'\n'</span>]);
+                infomsg=sprintf([<span class="string">'%s'</span>,<span class="string">'%s'</span>,<span class="string">'%s'</span>],<span class="string">' Source &amp; Detector: '</span>,montage{1,ichan},<span class="string">' '</span>,montage{2,ichan});
+                fprintf([infomsg <span class="string">'\n'</span>]);
+                <span class="keyword">for</span> k=1:ilocations
+                    infomsg=sprintf([<span class="string">'%s'</span>,<span class="string">'%s'</span>],<span class="string">' Labels available: '</span>,labels{k});
+                    fprintf([infomsg <span class="string">'\n'</span>]);
+                <span class="keyword">end</span>
+                <span class="keyword">return</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="keyword">for</span> k=1:3
+            curr_coords(k,1,ichan)=coordinates(k,sourcex);
+            curr_coords(k,2,ichan)=coordinates(k,detector);
+        <span class="keyword">end</span>
+
+        <span class="comment">% for each channel, determine the nine locations that are examined</span>
+        <span class="comment">% first, determine center on surface</span>
+        <span class="keyword">for</span> kk=1:10
+            <span class="keyword">for</span> k=1:3
+                surfcoord(k,kk)=cosines(kk).*curr_coords(k,1,ichan)+(1.-cosines(kk)).*curr_coords(k,2,ichan);
+                <span class="keyword">if</span> i_direct&lt;0
+                    surfcoord(2,kk)=-surfcoord(2,kk);
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="comment">% second, determine distance and maximum depth</span>
+        loc.dst(ichan,isub) = sqrt( sum( (curr_coords(:,1,ichan)-curr_coords(:,2,ichan)) .^2) );
+        loc.sloc(1:3,ichan,isub) = curr_coords(:,1,ichan);
+        loc.dloc(1:3,ichan,isub) = curr_coords(:,2,ichan);
+        loc.sdst(ichan,isub) = sqrt( sum( curr_coords(:,1,ichan).^2));
+        loc.ddst(ichan,isub) = sqrt( sum( curr_coords(:,2,ichan).^2));
+        loc.adst(ichan,isub) = .5*(loc.sdst(ichan,isub)+loc.ddst(ichan,isub));
+
+        <span class="comment">% compute depth (as half of source detector distance)</span>
+        <span class="comment">% or using a more accurate formula for homogenous media if depth less than approximately 2.5 cm</span>
+        scat2=prm.scatcoef;
+        abs2=prm.abscoef;
+
+        <span class="comment">% the following lines changes the scat and abs coefficient depending on the the wavelength -- commented on 8/15/06</span>
+        scat2=prm.scatcoef.*2.;
+        abs2=prm.abscoef.*2.;
+        <span class="keyword">if</span> loc.iwave(ichan,isub)==2
+            scat2=scat2.*0.3;
+            abs2=abs2.*0.2;
+        <span class="keyword">end</span>
+        depth=0.5+0.5.*sqrt(loc.dst(ichan,isub)./sqrt(300..*scat2.*abs2));
+
+        <span class="comment">% the following lines makes the depth deeper for phase -- commented on 8/15/06</span>
+        <span class="keyword">if</span> prm.idata==2||prm.idata==4||prm.idata==5
+            depth=depth.*1.5;
+        <span class="keyword">end</span>
+
+        <span class="comment">% determine radius of head at central location</span>
+        radius=0.0;
+        <span class="keyword">for</span> k=1:3
+            radius=radius+surfcoord(k,5+1).^2;
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> radius&lt;0.0001
+            radius=0.0001;
+        <span class="keyword">end</span>
+        radius=sqrt(radius);
+
+        <span class="comment">% rescale coordinates as a function of radius</span>
+        <span class="keyword">for</span> kk=1:10
+            <span class="keyword">for</span> k=1:3
+                prop(k)=surfcoord(k,kk)./radius;
+            <span class="keyword">end</span>
+            <span class="comment">%       rescale values as a function of the eccentricity</span>
+            <span class="keyword">for</span> k=1:3
+                loc.recd(k,kk,ichan,isub)=((radius-depth.*sines(kk))./radius).*prop(k);
+            <span class="keyword">end</span>
+            <span class="comment">%       reproduce original coordinates</span>
+            <span class="keyword">for</span> k=1:3
+                loc.recd(k,kk,ichan,isub)=loc.recd(k,kk,ichan,isub).*radius;
+            <span class="keyword">end</span>
+            rsltn=prm.resol;
+            <span class="comment">% the next line makes the size of the spheres (rsltn) bigger for the long wavelength -- commented on 8/15/06</span>
+            <span class="keyword">if</span> loc.iwave(ichan,isub)==2
+                rsltn=1.25.*prm.resol;
+            <span class="keyword">end</span>
+            loc.recd(4,kk,ichan,isub)=rsltn.*(0.5+0.5.*sines(kk));
+        <span class="keyword">end</span>
+
+        frac2 = ichan/prm.nch(isub);
+        frac1 = ((isub-1)+frac2) / prm.nsubj;
+        progressbar(frac1,frac2);
+
+    <span class="keyword">end</span> <span class="comment">%channel</span>
+<span class="keyword">end</span> <span class="comment">% subject</span>
+loc.recd(5,:,:,:) = zeros;
+fprintf(<span class="string">'Done.     \n'</span>);
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% readloc.m - Read the .loc file that is read by opt3d, and create the bananas
+%  Dr. Kyle Mathewson - Translation of Gabriele Gratton's opt3d_fast_v2.f90
+%  This subroutine gets the information about the locations of the sources and detectors for each subject, and determine the 3-D
+%  locations associated with each channel.  The 3-D locations are determined as a series of equidistant points along a semicircular
+%  arch between the source and the detector.
+%  In the present implementation, the locations can be expressed in Talairach coordinates.
+%  Each source or detector location is identified by a label.
+%  This routine uses a file (suggested extension: .loc) in which the following info needs to be provided:
+%        first row:                   name of a VMI file where an anatomical image is stored
+%        second row:                  name of a TAI file where eight reference points are stored (see Talairach routine)
+%        third row:           number of sources and number of detectors
+%  EDIT THIS
+%        a row for each subject with: (a) a value (+1 or -1) that will inidcate whether the left to right dimension needs to be inverted
+%                                     (b) the extended name (including path) of the file where the montage is described
+%                                     (c) the extended name (including path) of the .ELP file where the digitized location of each source
+%                                         and detector are stored (this also includes the appropriate labels)
+%                                     (d) the extended name (including path) of a file where the EMSE coordinates of the eight points
+%                                         used for the Talairach transformation are stored
+%  The montage file is a file made up of one row for each channel.
+%  This row contains the labels for the source and detector locations, the wavelength, and the modulation frequency.
+
+%% setup workspace and define function
+function readloc(fname_loc)
+global prm maxprm loc coordinates %cosines sines fname_mtg mrifile taifile mtglabel labels montage   detector dummy  fname1 fnametai infomsg curr_labels  prop sourcex surfcoord voxf voxs;
+
+%% setup progress bar
+plural = 's';
+if prm.nsubj == 1
+    plural = '';
+end
+progressbar(['Reading ' num2str(prm.nsubj) ' Subject''s Locations'], ...
+            'Channel Locations');
+        
+%% setup head/banana shape models???
+for i=0:9
+    sines(i+1)=sin((i).*3.14159./10.);
+    cosines(i+1)=0.5.*(1.-cos((i).*3.14159./10.));
+end
+
+%% set channel wavelength to its default value = 0
+loc.iwave = zeros(maxprm.knc,maxprm.kns);
+
+%% load montage information for .loc file
+fid_loc = fopen(fname_loc,'r');
+[mrifile]=fgetl(fid_loc);
+[taifile]=fgetl(fid_loc);
+nsources=fscanf(fid_loc,'%g',1);
+ndets=fscanf(fid_loc,'%g',1);
+dum = fgetl(fid_loc);
+
+%% load MRI data
+%      loadmri(mrifile,taifile);
+
+%% Read coordinates of each location for each subject
+for isub=1:prm.nsubj %for each subject
+    fprintf(['Sub ' num2str(isub) '. ']);
+
+    % set default modulation frequency
+    for j=1:maxprm.knc
+        loc.xmf(j,isub)=1.;
+    end
+    
+    i_direct=fgetl(fid_loc);
+    fname_mtg=fgetl(fid_loc);
+    
+    % read montage file
+    fid_mtg = fopen(fname_mtg,'r');
+    mtglabel=fgetl(fid_mtg);
+    
+    %setup the number of channels???
+    if prm.nchans<=96
+        prm.nch(isub)=prm.nchans.*prm.nses;
+    else
+        for j=1:prm.nses
+            prm.nchses(j,isub)=fscanf(fid_mtg,'%g',1);
+        end
+        prm.nch(isub)=0;
+        for j=1:prm.nses;
+            prm.nch(isub)=prm.nch(isub)+prm.nchses(j,isub);
+        end
+    end
+    
+    %actually read the file
+    for j=1:prm.nch(isub)
+        inch(1,j,isub)=fscanf(fid_mtg,'%g',1);
+        inch(2,j,isub)=fscanf(fid_mtg,'%g',1);
+        montage{1,j}=fscanf(fid_mtg,'%s',1);
+        montage{2,j}=fscanf(fid_mtg,'%s',1);
+        iwavexx=fscanf(fid_mtg,'%g',1);
+        xmfxx=fscanf(fid_mtg,'%g',1);
+        % fix these values for the rest of program
+        if iwavexx==690
+            loc.iwave(j,isub)=1;
+        end
+        if iwavexx==830
+            loc.iwave(j,isub)=2;
+        end
+        loc.xmf(j,isub)=xmfxx./110.;
+    end
+    fclose(fid_mtg);
+    
+    %open .tol file for that subject
+    fname_tol=fgetl(fid_loc);
+    fid_tol = fopen(fname_tol,'r');
+    ilocations=nsources+ndets;
+    
+    %fix if there are more than one source or detector accross montages
+    %in a single locations
+    temp_line ='xx';
+    line_count = 0;
+    while temp_line~= -1
+        temp_line = fgetl(fid_tol);
+        line_count = line_count+1;
+    end
+    if line_count < ilocations
+        ilocations = line_count-1;
+    end
+    fclose(fid_tol);
+    
+    fid_tol = fopen(fname_tol,'r');
+    coordinates = zeros(3,ilocations);
+    
+    % if TOL data
+    iline=0;
+    for j=1:ilocations
+        labels{j}=fscanf(fid_tol,'%s',1);
+        coordinates(2,j)=str2num(fscanf(fid_tol,'%s',1));
+        coordinates(1,j)=fscanf(fid_tol,'%g',1);
+        coordinates(3,j)=fscanf(fid_tol,'%g',1);
+        iline=iline+1;
+        for k=1:3
+            % transform coordinates in cm
+            coordinates(k,j)=coordinates(k,j).*0.1;
+        end
+    end
+    fclose(fid_tol);
+    ilocations=iline;
+    
+    % determine source and detector locations
+    for ichan=1:prm.nch(isub) %for each channel
+        
+        sourcex=0;
+        detector=0;
+        for k=1:ilocations %for each helmet location
+            curr_labels=labels(k);
+            if strcmp(deblank(montage(1,ichan)),deblank(curr_labels))
+                sourcex=k;
+            end
+            if strcmp(deblank(montage(2,ichan)),deblank(curr_labels))
+                detector=k;
+            end
+        end
+        
+        if isub==1
+            if sourcex==0||detector==0
+                infomsg=sprintf(['%s','%3i'],' Source or detector not found for channel ',ichan);
+                fprintf([infomsg '\n']);
+                infomsg=sprintf(['%s','%s','%s'],' Source & Detector: ',montage{1,ichan},' ',montage{2,ichan});
+                fprintf([infomsg '\n']);
+                for k=1:ilocations
+                    infomsg=sprintf(['%s','%s'],' Labels available: ',labels{k});
+                    fprintf([infomsg '\n']);
+                end
+                return
+            end
+        end
+        
+        for k=1:3
+            curr_coords(k,1,ichan)=coordinates(k,sourcex);
+            curr_coords(k,2,ichan)=coordinates(k,detector);
+        end
+        
+        % for each channel, determine the nine locations that are examined
+        % first, determine center on surface
+        for kk=1:10
+            for k=1:3
+                surfcoord(k,kk)=cosines(kk).*curr_coords(k,1,ichan)+(1.-cosines(kk)).*curr_coords(k,2,ichan);
+                if i_direct<0
+                    surfcoord(2,kk)=-surfcoord(2,kk);
+                end
+            end
+        end
+        
+        % second, determine distance and maximum depth
+        loc.dst(ichan,isub) = sqrt( sum( (curr_coords(:,1,ichan)-curr_coords(:,2,ichan)) .^2) );
+        loc.sloc(1:3,ichan,isub) = curr_coords(:,1,ichan);
+        loc.dloc(1:3,ichan,isub) = curr_coords(:,2,ichan);
+        loc.sdst(ichan,isub) = sqrt( sum( curr_coords(:,1,ichan).^2));
+        loc.ddst(ichan,isub) = sqrt( sum( curr_coords(:,2,ichan).^2));
+        loc.adst(ichan,isub) = .5*(loc.sdst(ichan,isub)+loc.ddst(ichan,isub));
+
+        % compute depth (as half of source detector distance)
+        % or using a more accurate formula for homogenous media if depth less than approximately 2.5 cm
+        scat2=prm.scatcoef;
+        abs2=prm.abscoef;
+        
+        % the following lines changes the scat and abs coefficient depending on the the wavelength REPLACE_WITH_DASH_DASH commented on 8/15/06
+        scat2=prm.scatcoef.*2.;
+        abs2=prm.abscoef.*2.;
+        if loc.iwave(ichan,isub)==2
+            scat2=scat2.*0.3;
+            abs2=abs2.*0.2;
+        end
+        depth=0.5+0.5.*sqrt(loc.dst(ichan,isub)./sqrt(300..*scat2.*abs2));
+        
+        % the following lines makes the depth deeper for phase REPLACE_WITH_DASH_DASH commented on 8/15/06
+        if prm.idata==2||prm.idata==4||prm.idata==5
+            depth=depth.*1.5;
+        end
+        
+        % determine radius of head at central location
+        radius=0.0;
+        for k=1:3
+            radius=radius+surfcoord(k,5+1).^2;
+        end
+        if radius<0.0001
+            radius=0.0001;
+        end
+        radius=sqrt(radius);
+        
+        % rescale coordinates as a function of radius
+        for kk=1:10
+            for k=1:3
+                prop(k)=surfcoord(k,kk)./radius;
+            end
+            %       rescale values as a function of the eccentricity
+            for k=1:3
+                loc.recd(k,kk,ichan,isub)=((radius-depth.*sines(kk))./radius).*prop(k);
+            end
+            %       reproduce original coordinates
+            for k=1:3
+                loc.recd(k,kk,ichan,isub)=loc.recd(k,kk,ichan,isub).*radius;
+            end
+            rsltn=prm.resol;
+            % the next line makes the size of the spheres (rsltn) bigger for the long wavelength REPLACE_WITH_DASH_DASH commented on 8/15/06
+            if loc.iwave(ichan,isub)==2
+                rsltn=1.25.*prm.resol;
+            end
+            loc.recd(4,kk,ichan,isub)=rsltn.*(0.5+0.5.*sines(kk));
+        end
+        
+        frac2 = ichan/prm.nch(isub);
+        frac1 = ((isub-1)+frac2) / prm.nsubj;  
+        progressbar(frac1,frac2);
+        
+    end %channel
+end % subject
+loc.recd(5,:,:,:) = zeros;
+fprintf('Done.     \n');
+
+##### SOURCE END #####
+--></body></html>

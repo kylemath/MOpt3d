@@ -1,0 +1,156 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Slices.m - Cycle through each slice and compute lookup table</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-06-21"><meta name="DC.source" content="slices.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Slices.m - Cycle through each slice and compute lookup table</h1><!--introduction--><p>Calls look_slice - which calls setuplookup and in_lookup</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">compute the bananas for the whole brain</a></li></ul></div><h2>compute the bananas for the whole brain<a name="1"></a></h2><pre class="codeinput">progressbar([<span class="string">'Computing '</span> num2str(prm.nslice) <span class="string">' Light Path Slice'</span> slice_plural], <span class="keyword">...</span>
+            [num2str(prm.nsubj) <span class="string">' Subject'</span> sub_plural], <span class="keyword">...</span>
+            [num2str(maxprm.kre2) <span class="string">' Slice Columns'</span>], <span class="keyword">...</span>
+            <span class="string">'Writing Lookup Tables'</span>);
+
+
+look.coverage_slices(96,96,96,prm.nsubj) = 0;
+look.log_chan_per_vox{96,96,96,prm.nsubj} = [];
+look.log_weight_per_vox{96,96,96,prm.nsubj} = [];
+
+<span class="keyword">for</span> curr_slice = prm.slices
+    fprintf([<span class="string">'Slice '</span> num2str(curr_slice) <span class="string">'. \n'</span>]);
+    prm.islice = curr_slice;
+    look_slice
+    <span class="keyword">if</span> prm.modeltype == 1
+        look.coverage_slices(curr_slice/2,:,:,:) = look.n_chan_per_vox; <span class="comment">%indicate which voxels are covered</span>
+    <span class="keyword">end</span>
+    <span class="keyword">for</span> y=1:96
+        <span class="keyword">for</span> z=1:96
+            <span class="keyword">for</span> s=1:prm.nsubj
+                <span class="keyword">if</span> prm.modeltype == 2
+                    look.coverage_slices(curr_slice/2,y,z,s) = sum(look.idw_chan_per_vox(2,1:look.n_chan_per_vox(y,z,s),y,z,s));
+                <span class="keyword">end</span>
+                look.log_chan_per_vox{curr_slice/2,y,z,s} = look.idw_chan_per_vox(1,1:look.n_chan_per_vox(y,z,s),y,z,s); <span class="comment">%indicate for each voxel which chans are covered</span>
+                look.log_weight_per_vox{curr_slice/2,y,z,s} = look.idw_chan_per_vox(2,1:look.n_chan_per_vox(y,z,s),y,z,s); <span class="comment">%indicate weights of those chans</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="comment">%update progress bar</span>
+        frac_y = y/96;
+        frac = ((curr_slice - prm.slices(1)+2)/2)/prm.nslice;
+        progressbar(frac,[],[],frac_y);
+    <span class="keyword">end</span>
+    progressbar([],[],[],0); <span class="comment">%reset lookup</span>
+
+<span class="keyword">end</span>
+progressbar(1); <span class="comment">%close</span>
+clear <span class="string">curr_slice</span> <span class="string">y</span> <span class="string">z</span>
+</pre><pre class="codeoutput">Undefined variable "prm" or function "prm.nslice".
+
+Error in slices (line 6)
+progressbar(['Computing ' num2str(prm.nslice) ' Light Path Slice' slice_plural], ...
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Slices.m - Cycle through each slice and compute lookup table
+% Calls look_slice - which calls setuplookup and in_lookup
+
+
+%% compute the bananas for the whole brain
+progressbar(['Computing ' num2str(prm.nslice) ' Light Path Slice' slice_plural], ...
+            [num2str(prm.nsubj) ' Subject' sub_plural], ... 
+            [num2str(maxprm.kre2) ' Slice Columns'], ...
+            'Writing Lookup Tables');
+
+
+look.coverage_slices(96,96,96,prm.nsubj) = 0;
+look.log_chan_per_vox{96,96,96,prm.nsubj} = [];
+look.log_weight_per_vox{96,96,96,prm.nsubj} = [];
+
+for curr_slice = prm.slices
+    fprintf(['Slice ' num2str(curr_slice) '. \n']);
+    prm.islice = curr_slice;
+    look_slice    
+    if prm.modeltype == 1
+        look.coverage_slices(curr_slice/2,:,:,:) = look.n_chan_per_vox; %indicate which voxels are covered
+    end 
+    for y=1:96
+        for z=1:96
+            for s=1:prm.nsubj
+                if prm.modeltype == 2
+                    look.coverage_slices(curr_slice/2,y,z,s) = sum(look.idw_chan_per_vox(2,1:look.n_chan_per_vox(y,z,s),y,z,s));
+                end
+                look.log_chan_per_vox{curr_slice/2,y,z,s} = look.idw_chan_per_vox(1,1:look.n_chan_per_vox(y,z,s),y,z,s); %indicate for each voxel which chans are covered
+                look.log_weight_per_vox{curr_slice/2,y,z,s} = look.idw_chan_per_vox(2,1:look.n_chan_per_vox(y,z,s),y,z,s); %indicate weights of those chans
+            end
+        end
+        
+        %update progress bar
+        frac_y = y/96;
+        frac = ((curr_slice - prm.slices(1)+2)/2)/prm.nslice;
+        progressbar(frac,[],[],frac_y);
+    end
+    progressbar([],[],[],0); %reset lookup
+
+end 
+progressbar(1); %close
+clear curr_slice y z
+##### SOURCE END #####
+--></body></html>

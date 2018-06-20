@@ -1,0 +1,518 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>prm_max.m include file for the opt-3d program</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-06-21"><meta name="DC.source" content="prm_max.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>prm_max.m include file for the opt-3d program</h1><p>Dr. Kyle Mathewson - June 8, 2013 - Translation of Gabriele Gratton's opt3d_fast_v2.f90</p><pre class="codeinput"><span class="keyword">function</span> prm_max
+
+<span class="keyword">global</span> maxprm
+<span class="comment">% max number of points</span>
+ maxprm.knp=62 ;
+<span class="comment">% max number of channels</span>
+ maxprm.knc=960 ;
+<span class="comment">% max number of channels used for a particular voxel</span>
+ maxprm.kncx=80 ;
+<span class="comment">% max number of bins</span>
+ maxprm.knb=16 ;
+<span class="comment">% max number of subjects</span>
+ maxprm.kns=32 ;
+<span class="comment">% max number of contrasts</span>
+ maxprm.knt=16 ;
+<span class="comment">% max number of contrasts</span>
+ maxprm.knt2=16 ;
+<span class="comment">% max number of ROI</span>
+ maxprm.knr=16 ;
+<span class="comment">% max number of areas for each ROI</span>
+ maxprm.kna=16 ;
+<span class="comment">% size of map in point</span>
+ maxprm.kres=192 ;
+<span class="comment">% size of lookup table</span>
+ maxprm.kre2=96 ;
+<span class="comment">%ratio between lookup and map</span>
+ maxprm.kresrat=maxprm.kre2/maxprm.kres;
+
+ maxprm.kres2=fix(maxprm.kres./2)+0.5 ;
+<span class="comment">% number of montages</span>
+ maxprm.kses=8 ;
+<span class="comment">% half field of view in mm</span>
+ maxprm.kfield=120 ;
+<span class="comment">% size of each voxel in mm</span>
+ maxprm.voxs=1.25 ;
+<span class="comment">% inverse of vox size</span>
+ maxprm.voxf=1../maxprm.voxs ;
+
+
+
+ <span class="comment">%y(values_12), values_12=zeros(5,9+1,knc,kns); end;</span>
+<span class="comment">% % global values_18; if isempty(values_18), values_18=zeros(knb,knt,kns); end;</span>
+<span class="comment">% % global values_9; if isempty(values_9), values_9=zeros(6,knr); end;</span>
+<span class="comment">% % global values_10; if isempty(values_10), values_10=zeros(knp,knt,knr,3); end;</span>
+<span class="comment">% % global values_25; if isempty(values_25), values_25=zeros(knp,kns,knt); end;</span>
+<span class="comment">% % global values_11; if isempty(values_11), values_11=zeros(knt,knr,3); end;</span>
+<span class="comment">% % global values_8; if isempty(values_8), values_8=zeros(6,kna,knr); end;</span>
+<span class="comment">% global xmf; if isempty(xmf), xmf=zeros(knc,kns); end;</span>
+<span class="comment">% % global values_6; if isempty(values_6), values_6=0; end;</span>
+<span class="comment">% % global values_7; if isempty(values_7), values_7=zeros(1,knr); end;</span>
+<span class="comment">% % global values_1; if isempty(values_1), values_1=zeros(kns,knc,knb); end;</span>
+<span class="comment">% % global values_15; if isempty(values_15), values_15=zeros(knt,knr); end;</span>
+<span class="comment">% % global intparm_12; if isempty(intparm_12), intparm_12=0; end;</span>
+<span class="comment">% % global intparm_14; if isempty(intparm_14), intparm_14=0; end;</span>
+<span class="comment">% % global intparm_31; if isempty(intparm_31), intparm_31=0; end;</span>
+<span class="comment">% % global intparm_32; if isempty(intparm_32), intparm_32=0; end;</span>
+<span class="comment">% % global values_24; if isempty(values_24), values_24=zeros(3,kns); end;</span>
+<span class="comment">% global iwave; if isempty(iwave), iwave=zeros(knc,kns); end;</span>
+<span class="comment">% % global values_29; if isempty(values_29), values_29=zeros(2,knc,kns); end;</span>
+<span class="comment">% global nsubj; if isempty(nsubj), nsubj=0; end;</span>
+<span class="comment">% % global intparm_2; if isempty(intparm_2), intparm_2=0; end;</span>
+<span class="comment">% global nses; if isempty(nses), nses=0; end;</span>
+<span class="comment">% % global intparm_4; if isempty(intparm_4), intparm_4=0; end;</span>
+<span class="comment">% global nchans; if isempty(nchans), nchans=0; end;</span>
+<span class="comment">% % global intparm_6; if isempty(intparm_6), intparm_6=0; end;</span>
+<span class="comment">% % global intparm_8; if isempty(intparm_8), intparm_8=0; end;</span>
+<span class="comment">% % global flags_1; if isempty(flags_1), flags_1=0; end;</span>
+<span class="comment">% % global intparm_7; if isempty(intparm_7), intparm_7=0; end;</span>
+<span class="comment">% % global values_16; if isempty(values_16), values_16=0; end;</span>
+<span class="comment">% % global intparm_44; if isempty(intparm_44), intparm_44=0; end;</span>
+<span class="comment">% % global values_37; if isempty(values_37), values_37=0; end;</span>
+<span class="comment">% % global intparm_23; if isempty(intparm_23), intparm_23=0; end;</span>
+<span class="comment">% % global flags_2; if isempty(flags_2), flags_2=0; end;</span>
+<span class="comment">% % global flags_3; if isempty(flags_3), flags_3=0; end;</span>
+<span class="comment">% % global flags_4; if isempty(flags_4), flags_4=0; end;</span>
+<span class="comment">% % global intparm_35; if isempty(intparm_35), intparm_35=0; end;</span>
+<span class="comment">% % global flags_5; if isempty(flags_5), flags_5=0; end;</span>
+<span class="comment">% % global intparm_39; if isempty(intparm_39), intparm_39=0; end;</span>
+<span class="comment">% % global intparm_38; if isempty(intparm_38), intparm_38=0; end;</span>
+<span class="comment">% % global intparm_36; if isempty(intparm_36), intparm_36=0; end;</span>
+<span class="comment">% % global intparm_9; if isempty(intparm_9), intparm_9=0; end;</span>
+<span class="comment">% % global intparm_37; if isempty(intparm_37), intparm_37=0; end;</span>
+<span class="comment">% % global intparm_10; if isempty(intparm_10), intparm_10=0; end;</span>
+<span class="comment">% % global intparm_11; if isempty(intparm_11), intparm_11=0; end;</span>
+<span class="comment">% % global intparm_13; if isempty(intparm_13), intparm_13=0; end;</span>
+<span class="comment">% % global intparm_18; if isempty(intparm_18), intparm_18=0; end;</span>
+<span class="comment">% % global intparm_19; if isempty(intparm_19), intparm_19=0; end;</span>
+<span class="comment">% % global intparm_20; if isempty(intparm_20), intparm_20=0; end;</span>
+<span class="comment">% % global intparm_21; if isempty(intparm_21), intparm_21=0; end;</span>
+<span class="comment">% % global intparm_22; if isempty(intparm_22), intparm_22=0; end;</span>
+<span class="comment">% % global intparm_24; if isempty(intparm_24), intparm_24=0; end;</span>
+<span class="comment">% % global intparm_25; if isempty(intparm_25), intparm_25=0; end;</span>
+<span class="comment">% % global intparm_26; if isempty(intparm_26), intparm_26=0; end;</span>
+<span class="comment">% % global intparm_27; if isempty(intparm_27), intparm_27=0; end;</span>
+<span class="comment">% % global intparm_28; if isempty(intparm_28), intparm_28=0; end;</span>
+<span class="comment">% % global intparm_29; if isempty(intparm_29), intparm_29=0; end;</span>
+<span class="comment">% global idirect; if isempty(idirect), idirect=0; end;</span>
+<span class="comment">% % global intparm_33; if isempty(intparm_33), intparm_33=0; end;</span>
+<span class="comment">% % global intparm_16; if isempty(intparm_16), intparm_16=0; end;</span>
+<span class="comment">% % global intparm_17; if isempty(intparm_17), intparm_17=0; end;</span>
+<span class="comment">% % global intparm_40; if isempty(intparm_40), intparm_40=0; end;</span>
+<span class="comment">% % global intparm_41; if isempty(intparm_41), intparm_41=0; end;</span>
+<span class="comment">% % global flags_6; if isempty(flags_6), flags_6=0; end;</span>
+<span class="comment">% % global intparm_43; if isempty(intparm_43), intparm_43=0; end;</span>
+<span class="comment">% % global intparm_42; if isempty(intparm_42), intparm_42=0; end;</span>
+<span class="comment">% % global intparm_45; if isempty(intparm_45), intparm_45=0; end;</span>
+<span class="comment">% % global intparm_46; if isempty(intparm_46), intparm_46=0; end;</span>
+<span class="comment">% % global intparm_47; if isempty(intparm_47), intparm_47=0; end;</span>
+<span class="comment">% % global realparm_1; if isempty(realparm_1), realparm_1=0; end;</span>
+<span class="comment">% % global realparm_2; if isempty(realparm_2), realparm_2=0; end;</span>
+<span class="comment">% % global realparm_3; if isempty(realparm_3), realparm_3=0; end;</span>
+<span class="comment">% % global realparm_4; if isempty(realparm_4), realparm_4=0; end;</span>
+<span class="comment">% % global realparm_5; if isempty(realparm_5), realparm_5=0; end;</span>
+<span class="comment">% % global realparm_6; if isempty(realparm_6), realparm_6=0; end;</span>
+<span class="comment">% % global realparm_7; if isempty(realparm_7), realparm_7=0; end;</span>
+<span class="comment">% % global realparm_8; if isempty(realparm_8), realparm_8=0; end;</span>
+<span class="comment">% % global realparm_9; if isempty(realparm_9), realparm_9=0; end;</span>
+<span class="comment">% % global realparm_10; if isempty(realparm_10), realparm_10=0; end;</span>
+<span class="comment">% % global realparm_21; if isempty(realparm_21), realparm_21=0; end;</span>
+<span class="comment">% % global realparm_11; if isempty(realparm_11), realparm_11=0; end;</span>
+<span class="comment">% % global realparm_22; if isempty(realparm_22), realparm_22=0; end;</span>
+<span class="comment">% % global realparm_12; if isempty(realparm_12), realparm_12=0; end;</span>
+<span class="comment">% % global realparm_13; if isempty(realparm_13), realparm_13=0; end;</span>
+<span class="comment">% % global realparm_14; if isempty(realparm_14), realparm_14=0; end;</span>
+<span class="comment">% % global realparm_15; if isempty(realparm_15), realparm_15=0; end;</span>
+<span class="comment">% % global realparm_16; if isempty(realparm_16), realparm_16=0; end;</span>
+<span class="comment">% % global realparm_17; if isempty(realparm_17), realparm_17=zeros(3,11); end;</span>
+<span class="comment">% % global realparm_18; if isempty(realparm_18), realparm_18=zeros(1,3); end;</span>
+<span class="comment">% % global realparm_19; if isempty(realparm_19), realparm_19=0; end;</span>
+<span class="comment">% % global realparm_20; if isempty(realparm_20), realparm_20=0; end;</span>
+<span class="comment">% % global values_27; if isempty(values_27), values_27=zeros(1,knp); end;</span>
+<span class="comment">% % global values_30; if isempty(values_30), values_30=zeros(kns,kre2,kre2,knt); end;</span>
+<span class="comment">% % global values_31; if isempty(values_31), values_31=zeros(kns,kre2,kre2,knt); end;</span>
+<span class="comment">% % %</span>
+<span class="comment">% % global values_20; if isempty(values_20), values_20=zeros(kns,kres,kres,knt); end;</span>
+<span class="comment">% % global values_21; if isempty(values_21), values_21=zeros(kns,kre2,kre2,knp,knt); end;</span>
+<span class="comment">% % global values_22; if isempty(values_22), values_22=zeros(kns,kre2,kre2,knp); end;</span>
+<span class="comment">% % global values_35; if isempty(values_35), values_35=zeros(1,knc); end;</span>
+<span class="comment">% % global values_36; if isempty(values_36), values_36=zeros(1,knc); end;</span>
+<span class="comment">% % global values_23; if isempty(values_23), values_23=zeros(kns,kres,kres,knt); end;</span>
+<span class="comment">% global nchses; if isempty(nchses), nchses=zeros(kses,kns); end;</span>
+<span class="comment">% global nch; if isempty(nch), nch=zeros(1,kns); end;</span>
+<span class="comment">% % global labels_2; if isempty(labels_2), labels_2=cell(1,knr); end;</span>
+<span class="comment">% % global labels_1; if isempty(labels_1), labels_1=cell(1,knt); end;</span>
+<span class="comment">% % global values_14; if isempty(values_14), values_14=zeros(kres,kres,kres); end;</span>
+<span class="comment">% % global values_13; if isempty(values_13), values_13=zeros(1,knc); end;</span>
+<span class="comment">% % global values_34; if isempty(values_34), values_34=zeros(2,knc); end;</span>
+<span class="comment">% % global values_32; if isempty(values_32), values_32=zeros(2,kncx,kre2,kre2,kns); end;</span>
+<span class="comment">% % global values_33; if isempty(values_33), values_33=zeros(kre2,kre2,kns); end;</span>
+<span class="comment">% % global look_flag_1; if isempty(look_flag_1), look_flag_1=0; end;</span>
+<span class="comment">% % global spm_1; if isempty(spm_1), spm_1=0; end;</span>
+<span class="comment">% % global spm_2; if isempty(spm_2), spm_2=0; end;</span>
+<span class="comment">% % global spm_10; if isempty(spm_10), spm_10=0; end;</span>
+<span class="comment">% % global spm_3; if isempty(spm_3), spm_3=0; end;</span>
+<span class="comment">% % global spm_4; if isempty(spm_4), spm_4=0; end;</span>
+<span class="comment">% % global spm_5; if isempty(spm_5), spm_5=0; end;</span>
+<span class="comment">% % global spm_6; if isempty(spm_6), spm_6=0; end;</span>
+<span class="comment">% % global spm_7; if isempty(spm_7), spm_7=0; end;</span>
+<span class="comment">% % global spm_8; if isempty(spm_8), spm_8=0; end;</span>
+<span class="comment">% % global spm_9; if isempty(spm_9), spm_9=0; end;</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">% %defaults</span>
+<span class="comment">% look_flag=0;</span>
+<span class="comment">% nsubj=4;</span>
+<span class="comment">% nsubj2=4;</span>
+<span class="comment">% nses=3;</span>
+<span class="comment">% ncond=3;</span>
+<span class="comment">% npts=20;</span>
+<span class="comment">% dt=2;</span>
+<span class="comment">% icond=1;</span>
+<span class="comment">% nchans=8;</span>
+<span class="comment">% ibeg=1;</span>
+<span class="comment">% iend=4;</span>
+<span class="comment">% idirect=1;</span>
+<span class="comment">% srate=20.;</span>
+<span class="comment">% srate2=srate;</span>
+<span class="comment">% stimon=80.;</span>
+<span class="comment">% begbase=-80.;</span>
+<span class="comment">% endbase=0.;</span>
+<span class="comment">% errcrit=0.;</span>
+<span class="comment">% errcrit0=0.;</span>
+<span class="comment">% mapdir=1;</span>
+<span class="comment">% idbeg=9;</span>
+<span class="comment">% idend=9;</span>
+<span class="comment">% islice=kres+1;</span>
+<span class="comment">% jroi=1;</span>
+<span class="comment">% ncont=4;</span>
+<span class="comment">% nrotfact=0;</span>
+<span class="comment">% irange=24;</span>
+<span class="comment">% ierrflag=0;</span>
+<span class="comment">% iroiflag=0;</span>
+<span class="comment">% ilp1=51;</span>
+<span class="comment">% ilp0=51;</span>
+<span class="comment">% iflen=3;</span>
+<span class="comment">% intvalbeg=8;</span>
+<span class="comment">% intvalend=10;</span>
+<span class="comment">% datatype=2;</span>
+<span class="comment">% mapdir2=0;</span>
+<span class="comment">% islice2=0;</span>
+<span class="comment">% abscoef=.01;</span>
+<span class="comment">% scatcoef=1.;</span>
+<span class="comment">% resol=0.5;</span>
+<span class="comment">% idata=2;</span>
+<span class="comment">% idetr=2;</span>
+<span class="comment">% ierrterm=1;</span>
+<span class="comment">% ipol=1;</span>
+<span class="comment">% kwave=1;</span>
+<span class="comment">% dstcrit=1.5;</span>
+<span class="comment">% dstcrit2=7.5;</span>
+<span class="comment">% spatfilt=0.0;</span>
+<span class="comment">% spatfilt2=0.0;</span>
+<span class="comment">% ialignflag=0;</span>
+<span class="comment">% normalize=1;</span>
+<span class="comment">% iavgsub=1;</span>
+<span class="comment">% izcrit=1;</span>
+<span class="comment">% modeltype=1;</span>
+<span class="comment">% idcoord=1;</span>
+<span class="comment">% nptsdf=1;</span>
+<span class="comment">% firstpoint=1;</span>
+<span class="comment">% decfactor=1;</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% prm_max.m include file for the opt-3d program
+% Dr. Kyle Mathewson - June 8, 2013 - Translation of Gabriele Gratton's opt3d_fast_v2.f90
+
+function prm_max
+
+global maxprm
+% max number of points
+ maxprm.knp=62 ; 
+% max number of channels
+ maxprm.knc=960 ; 
+% max number of channels used for a particular voxel
+ maxprm.kncx=80 ;
+% max number of bins
+ maxprm.knb=16 ; 
+% max number of subjects
+ maxprm.kns=32 ; 
+% max number of contrasts
+ maxprm.knt=16 ; 
+% max number of contrasts
+ maxprm.knt2=16 ; 
+% max number of ROI
+ maxprm.knr=16 ; 
+% max number of areas for each ROI
+ maxprm.kna=16 ; 
+% size of map in point
+ maxprm.kres=192 ;
+% size of lookup table
+ maxprm.kre2=96 ; 
+%ratio between lookup and map
+ maxprm.kresrat=maxprm.kre2/maxprm.kres;
+ 
+ maxprm.kres2=fix(maxprm.kres./2)+0.5 ; 
+% number of montages
+ maxprm.kses=8 ; 
+% half field of view in mm
+ maxprm.kfield=120 ; 
+% size of each voxel in mm
+ maxprm.voxs=1.25 ; 
+% inverse of vox size
+ maxprm.voxf=1../maxprm.voxs ; 
+
+ 
+ 
+ %y(values_12), values_12=zeros(5,9+1,knc,kns); end;
+% % global values_18; if isempty(values_18), values_18=zeros(knb,knt,kns); end;
+% % global values_9; if isempty(values_9), values_9=zeros(6,knr); end;
+% % global values_10; if isempty(values_10), values_10=zeros(knp,knt,knr,3); end;
+% % global values_25; if isempty(values_25), values_25=zeros(knp,kns,knt); end;
+% % global values_11; if isempty(values_11), values_11=zeros(knt,knr,3); end;
+% % global values_8; if isempty(values_8), values_8=zeros(6,kna,knr); end;
+% global xmf; if isempty(xmf), xmf=zeros(knc,kns); end;
+% % global values_6; if isempty(values_6), values_6=0; end;
+% % global values_7; if isempty(values_7), values_7=zeros(1,knr); end;
+% % global values_1; if isempty(values_1), values_1=zeros(kns,knc,knb); end;
+% % global values_15; if isempty(values_15), values_15=zeros(knt,knr); end;
+% % global intparm_12; if isempty(intparm_12), intparm_12=0; end;
+% % global intparm_14; if isempty(intparm_14), intparm_14=0; end;
+% % global intparm_31; if isempty(intparm_31), intparm_31=0; end;
+% % global intparm_32; if isempty(intparm_32), intparm_32=0; end;
+% % global values_24; if isempty(values_24), values_24=zeros(3,kns); end;
+% global iwave; if isempty(iwave), iwave=zeros(knc,kns); end;
+% % global values_29; if isempty(values_29), values_29=zeros(2,knc,kns); end;
+% global nsubj; if isempty(nsubj), nsubj=0; end;
+% % global intparm_2; if isempty(intparm_2), intparm_2=0; end;
+% global nses; if isempty(nses), nses=0; end;
+% % global intparm_4; if isempty(intparm_4), intparm_4=0; end;
+% global nchans; if isempty(nchans), nchans=0; end;
+% % global intparm_6; if isempty(intparm_6), intparm_6=0; end;
+% % global intparm_8; if isempty(intparm_8), intparm_8=0; end;
+% % global flags_1; if isempty(flags_1), flags_1=0; end;
+% % global intparm_7; if isempty(intparm_7), intparm_7=0; end;
+% % global values_16; if isempty(values_16), values_16=0; end;
+% % global intparm_44; if isempty(intparm_44), intparm_44=0; end;
+% % global values_37; if isempty(values_37), values_37=0; end;
+% % global intparm_23; if isempty(intparm_23), intparm_23=0; end;
+% % global flags_2; if isempty(flags_2), flags_2=0; end;
+% % global flags_3; if isempty(flags_3), flags_3=0; end;
+% % global flags_4; if isempty(flags_4), flags_4=0; end;
+% % global intparm_35; if isempty(intparm_35), intparm_35=0; end;
+% % global flags_5; if isempty(flags_5), flags_5=0; end;
+% % global intparm_39; if isempty(intparm_39), intparm_39=0; end;
+% % global intparm_38; if isempty(intparm_38), intparm_38=0; end;
+% % global intparm_36; if isempty(intparm_36), intparm_36=0; end;
+% % global intparm_9; if isempty(intparm_9), intparm_9=0; end;
+% % global intparm_37; if isempty(intparm_37), intparm_37=0; end;
+% % global intparm_10; if isempty(intparm_10), intparm_10=0; end;
+% % global intparm_11; if isempty(intparm_11), intparm_11=0; end;
+% % global intparm_13; if isempty(intparm_13), intparm_13=0; end;
+% % global intparm_18; if isempty(intparm_18), intparm_18=0; end;
+% % global intparm_19; if isempty(intparm_19), intparm_19=0; end;
+% % global intparm_20; if isempty(intparm_20), intparm_20=0; end;
+% % global intparm_21; if isempty(intparm_21), intparm_21=0; end;
+% % global intparm_22; if isempty(intparm_22), intparm_22=0; end;
+% % global intparm_24; if isempty(intparm_24), intparm_24=0; end;
+% % global intparm_25; if isempty(intparm_25), intparm_25=0; end;
+% % global intparm_26; if isempty(intparm_26), intparm_26=0; end;
+% % global intparm_27; if isempty(intparm_27), intparm_27=0; end;
+% % global intparm_28; if isempty(intparm_28), intparm_28=0; end;
+% % global intparm_29; if isempty(intparm_29), intparm_29=0; end;
+% global idirect; if isempty(idirect), idirect=0; end;
+% % global intparm_33; if isempty(intparm_33), intparm_33=0; end;
+% % global intparm_16; if isempty(intparm_16), intparm_16=0; end;
+% % global intparm_17; if isempty(intparm_17), intparm_17=0; end;
+% % global intparm_40; if isempty(intparm_40), intparm_40=0; end;
+% % global intparm_41; if isempty(intparm_41), intparm_41=0; end;
+% % global flags_6; if isempty(flags_6), flags_6=0; end;
+% % global intparm_43; if isempty(intparm_43), intparm_43=0; end;
+% % global intparm_42; if isempty(intparm_42), intparm_42=0; end;
+% % global intparm_45; if isempty(intparm_45), intparm_45=0; end;
+% % global intparm_46; if isempty(intparm_46), intparm_46=0; end;
+% % global intparm_47; if isempty(intparm_47), intparm_47=0; end;
+% % global realparm_1; if isempty(realparm_1), realparm_1=0; end;
+% % global realparm_2; if isempty(realparm_2), realparm_2=0; end;
+% % global realparm_3; if isempty(realparm_3), realparm_3=0; end;
+% % global realparm_4; if isempty(realparm_4), realparm_4=0; end;
+% % global realparm_5; if isempty(realparm_5), realparm_5=0; end;
+% % global realparm_6; if isempty(realparm_6), realparm_6=0; end;
+% % global realparm_7; if isempty(realparm_7), realparm_7=0; end;
+% % global realparm_8; if isempty(realparm_8), realparm_8=0; end;
+% % global realparm_9; if isempty(realparm_9), realparm_9=0; end;
+% % global realparm_10; if isempty(realparm_10), realparm_10=0; end;
+% % global realparm_21; if isempty(realparm_21), realparm_21=0; end;
+% % global realparm_11; if isempty(realparm_11), realparm_11=0; end;
+% % global realparm_22; if isempty(realparm_22), realparm_22=0; end;
+% % global realparm_12; if isempty(realparm_12), realparm_12=0; end;
+% % global realparm_13; if isempty(realparm_13), realparm_13=0; end;
+% % global realparm_14; if isempty(realparm_14), realparm_14=0; end;
+% % global realparm_15; if isempty(realparm_15), realparm_15=0; end;
+% % global realparm_16; if isempty(realparm_16), realparm_16=0; end;
+% % global realparm_17; if isempty(realparm_17), realparm_17=zeros(3,11); end;
+% % global realparm_18; if isempty(realparm_18), realparm_18=zeros(1,3); end;
+% % global realparm_19; if isempty(realparm_19), realparm_19=0; end;
+% % global realparm_20; if isempty(realparm_20), realparm_20=0; end;
+% % global values_27; if isempty(values_27), values_27=zeros(1,knp); end;
+% % global values_30; if isempty(values_30), values_30=zeros(kns,kre2,kre2,knt); end;
+% % global values_31; if isempty(values_31), values_31=zeros(kns,kre2,kre2,knt); end;
+% % %
+% % global values_20; if isempty(values_20), values_20=zeros(kns,kres,kres,knt); end;
+% % global values_21; if isempty(values_21), values_21=zeros(kns,kre2,kre2,knp,knt); end;
+% % global values_22; if isempty(values_22), values_22=zeros(kns,kre2,kre2,knp); end;
+% % global values_35; if isempty(values_35), values_35=zeros(1,knc); end;
+% % global values_36; if isempty(values_36), values_36=zeros(1,knc); end;
+% % global values_23; if isempty(values_23), values_23=zeros(kns,kres,kres,knt); end;
+% global nchses; if isempty(nchses), nchses=zeros(kses,kns); end;
+% global nch; if isempty(nch), nch=zeros(1,kns); end;
+% % global labels_2; if isempty(labels_2), labels_2=cell(1,knr); end;
+% % global labels_1; if isempty(labels_1), labels_1=cell(1,knt); end;
+% % global values_14; if isempty(values_14), values_14=zeros(kres,kres,kres); end;
+% % global values_13; if isempty(values_13), values_13=zeros(1,knc); end;
+% % global values_34; if isempty(values_34), values_34=zeros(2,knc); end;
+% % global values_32; if isempty(values_32), values_32=zeros(2,kncx,kre2,kre2,kns); end;
+% % global values_33; if isempty(values_33), values_33=zeros(kre2,kre2,kns); end;
+% % global look_flag_1; if isempty(look_flag_1), look_flag_1=0; end;
+% % global spm_1; if isempty(spm_1), spm_1=0; end;
+% % global spm_2; if isempty(spm_2), spm_2=0; end;
+% % global spm_10; if isempty(spm_10), spm_10=0; end;
+% % global spm_3; if isempty(spm_3), spm_3=0; end;
+% % global spm_4; if isempty(spm_4), spm_4=0; end;
+% % global spm_5; if isempty(spm_5), spm_5=0; end;
+% % global spm_6; if isempty(spm_6), spm_6=0; end;
+% % global spm_7; if isempty(spm_7), spm_7=0; end;
+% % global spm_8; if isempty(spm_8), spm_8=0; end;
+% % global spm_9; if isempty(spm_9), spm_9=0; end;
+% 
+% 
+% %defaults 
+% look_flag=0;
+% nsubj=4;
+% nsubj2=4;
+% nses=3;
+% ncond=3;
+% npts=20;
+% dt=2;
+% icond=1;
+% nchans=8;
+% ibeg=1;
+% iend=4;
+% idirect=1;
+% srate=20.;
+% srate2=srate;
+% stimon=80.;
+% begbase=-80.;
+% endbase=0.;
+% errcrit=0.;
+% errcrit0=0.;
+% mapdir=1;
+% idbeg=9;
+% idend=9;
+% islice=kres+1;
+% jroi=1;
+% ncont=4;
+% nrotfact=0;
+% irange=24;
+% ierrflag=0;
+% iroiflag=0;
+% ilp1=51;
+% ilp0=51;
+% iflen=3;
+% intvalbeg=8;
+% intvalend=10;
+% datatype=2;
+% mapdir2=0;
+% islice2=0;
+% abscoef=.01;
+% scatcoef=1.;
+% resol=0.5;
+% idata=2;
+% idetr=2;
+% ierrterm=1;
+% ipol=1;
+% kwave=1;
+% dstcrit=1.5;
+% dstcrit2=7.5;
+% spatfilt=0.0;
+% spatfilt2=0.0;
+% ialignflag=0;
+% normalize=1;
+% iavgsub=1;
+% izcrit=1;
+% modeltype=1;
+% idcoord=1;
+% nptsdf=1;
+% firstpoint=1;
+% decfactor=1;
+
+
+##### SOURCE END #####
+--></body></html>

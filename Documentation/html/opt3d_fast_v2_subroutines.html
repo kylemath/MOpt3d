@@ -1,0 +1,216 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>opt3d_fast_v2_noPCA.f90 - Subroutines (in order)</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-06-21"><meta name="DC.source" content="opt3d_fast_v2_subroutines.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>opt3d_fast_v2_noPCA.f90 - Subroutines (in order)</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Include</a></li><li><a href="#2">Graphics</a></li><li><a href="#3">Subroutines</a></li></ul></div><h2>Include<a name="1"></a></h2><pre class="codeinput"><span class="comment">% Opt3d_fast.inc</span>
+</pre><h2>Graphics<a name="2"></a></h2><pre class="codeinput"><span class="comment">% opt3d_v80.rc</span>
+</pre><h2>Subroutines<a name="3"></a></h2><pre class="codeinput"><span class="comment">% plotdata</span>
+<span class="comment">% spat_filter</span>
+<span class="comment">% save_matrix</span>
+<span class="comment">% help_page</span>
+<span class="comment">% get_coord</span>
+<span class="comment">% plot_point</span>
+<span class="comment">% plotwaveforms</span>
+<span class="comment">% get_point_to_plot</span>
+<span class="comment">% plotroi</span>
+<span class="comment">% get_point_wave</span>
+<span class="comment">% DrawGraph</span>
+<span class="comment">% *readprm</span>
+<span class="comment">% writeprm</span>
+<span class="comment">% loadROI</span>
+<span class="comment">% loadalign</span>
+<span class="comment">% saveROI</span>
+<span class="comment">% loadanal</span>
+<span class="comment">% readslice</span>
+<span class="comment">% writeslice</span>
+<span class="comment">% readdata</span>
+<span class="comment">% detrend</span>
+<span class="comment">% stats</span>
+<span class="comment">% determine_subj</span>
+<span class="comment">% compute_contrast</span>
+<span class="comment">% subj_value</span>
+<span class="comment">% *in_lookup</span>
+<span class="comment">% out_lookup</span>
+<span class="comment">% stats_slice</span>
+<span class="comment">% xprod</span>
+<span class="comment">% xmapfilt</span>
+<span class="comment">% determine_interval</span>
+<span class="comment">% add_contrast</span>
+<span class="comment">% consistency</span>
+<span class="comment">% roistats</span>
+<span class="comment">% bootstrap</span>
+<span class="comment">% gennormdist</span>
+<span class="comment">% norm</span>
+<span class="comment">% norminv</span>
+<span class="comment">% convtinz</span>
+<span class="comment">% tdist</span>
+<span class="comment">% gentdist</span>
+<span class="comment">% tprob</span>
+<span class="comment">% theight</span>
+<span class="comment">% gamma</span>
+<span class="comment">% roi_intervalstats</span>
+<span class="comment">% valint</span>
+<span class="comment">% *readloc2</span>
+<span class="comment">% talairach</span>
+<span class="comment">% from_tai_to_mni</span>
+<span class="comment">% loadMRI</span>
+<span class="comment">% rotatei</span>
+<span class="comment">% look</span>
+<span class="comment">% *setuplookup</span>
+<span class="comment">% *look_slice</span>
+<span class="comment">% plotdata</span>
+<span class="comment">% reset_for_resels</span>
+<span class="comment">% sum_for_resels</span>
+<span class="comment">% compute_resels</span>
+<span class="comment">% thick_line</span>
+<span class="comment">% brain_image</span>
+<span class="comment">% pzcrit</span>
+<span class="comment">% do_filt</span>
+<span class="comment">% amplat</span>
+<span class="comment">% compute_pulseret</span>
+<span class="comment">% compute_amplat</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% opt3d_fast_v2_noPCA.f90 - Subroutines (in order)
+
+%% Include
+
+% Opt3d_fast.inc
+
+%% Graphics
+
+% opt3d_v80.rc
+
+%% Subroutines
+
+% plotdata
+% spat_filter
+% save_matrix
+% help_page
+% get_coord
+% plot_point
+% plotwaveforms
+% get_point_to_plot
+% plotroi
+% get_point_wave
+% DrawGraph
+% *readprm
+% writeprm
+% loadROI
+% loadalign
+% saveROI
+% loadanal
+% readslice
+% writeslice
+% readdata
+% detrend
+% stats
+% determine_subj
+% compute_contrast
+% subj_value
+% *in_lookup
+% out_lookup
+% stats_slice
+% xprod
+% xmapfilt
+% determine_interval
+% add_contrast
+% consistency
+% roistats
+% bootstrap
+% gennormdist
+% norm
+% norminv
+% convtinz
+% tdist
+% gentdist
+% tprob
+% theight
+% gamma
+% roi_intervalstats
+% valint
+% *readloc2
+% talairach
+% from_tai_to_mni
+% loadMRI
+% rotatei
+% look
+% *setuplookup
+% *look_slice
+% plotdata
+% reset_for_resels
+% sum_for_resels
+% compute_resels
+% thick_line
+% brain_image
+% pzcrit
+% do_filt
+% amplat
+% compute_pulseret
+% compute_amplat
+
+##### SOURCE END #####
+--></body></html>

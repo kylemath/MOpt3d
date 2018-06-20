@@ -1,0 +1,149 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>in_lookup.m - this subroutine encode channel info stored in look.one_vox_chans into look.idw_chan_per_vox and look.n_chan_per_vox</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-06-21"><meta name="DC.source" content="in_lookup.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>in_lookup.m - this subroutine encode channel info stored in look.one_vox_chans into look.idw_chan_per_vox and look.n_chan_per_vox</h1><!--introduction--><pre>Dr. Kyle Mathewson - June 8, 2013 - Translation of Gabriele Gratton's opt3d_fast_v2.f90
+j = x coordinate
+i = y coordinate
+isubj = subject
+must be called immediately after setuplookup subroutine</pre><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Setup workspace and define function</a></li><li><a href="#3">Select the channels for this voxel</a></li><li><a href="#4">Rescale the data to double voxels</a></li><li><a href="#5">Geometric model</a></li><li><a href="#7">Physical Model</a></li><li><a href="#9">count the channels</a></li></ul></div><h2>Setup workspace and define function<a name="1"></a></h2><pre class="codeinput"><span class="keyword">function</span> in_lookup(j,i,isubj)
+</pre><pre class="codeinput"><span class="keyword">global</span> prm maxprm look
+</pre><h2>Select the channels for this voxel<a name="3"></a></h2><pre class="codeinput">[chan_names] = find(look.one_vox_chans);
+n_near = length(chan_names);
+</pre><h2>Rescale the data to double voxels<a name="4"></a></h2><pre class="codeinput">jj=j.*maxprm.kresrat;
+ii=i.*maxprm.kresrat;
+</pre><pre class="codeoutput">Error using in_lookup (line 17)
+Not enough input arguments.
+</pre><h2>Geometric model<a name="5"></a></h2><pre class="codeinput"><span class="keyword">if</span> prm.modeltype == 1
+</pre><pre class="codeinput">    <span class="comment">%assign chan names</span>
+    look.idw_chan_per_vox(1,1:n_near,jj,ii,isubj)=chan_names;
+
+    <span class="comment">% give all the channels the same weight</span>
+    look.idw_chan_per_vox(2,1:n_near,jj,ii,isubj)=ones(1,n_near);
+</pre><h2>Physical Model<a name="7"></a></h2><pre class="codeinput"><span class="keyword">elseif</span> prm.modeltype == 2
+
+    <span class="comment">%retreive, scale, and clip weights</span>
+    weights = look.one_vox_weights.*1000000;
+    weights(weights&gt;256.*128-1) = 256.*128-1;
+    weights(weights&lt;-256.*128) = -256.*128;
+
+    <span class="comment">% select the channels for this voxel</span>
+    look.idw_chan_per_vox(1,1:n_near,jj,ii,isubj)=chan_names;
+
+    <span class="comment">% give the channel its weight</span>
+    look.idw_chan_per_vox(2,1:n_near,jj,ii,isubj)=weights(chan_names);
+<span class="keyword">end</span>
+</pre><h2>count the channels<a name="9"></a></h2><pre class="codeinput">look.n_chan_per_vox(jj,ii,isubj)=n_near;
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% in_lookup.m - this subroutine encode channel info stored in look.one_vox_chans into look.idw_chan_per_vox and look.n_chan_per_vox
+%  Dr. Kyle Mathewson - June 8, 2013 - Translation of Gabriele Gratton's opt3d_fast_v2.f90
+%  j = x coordinate
+%  i = y coordinate
+%  isubj = subject
+%  must be called immediately after setuplookup subroutine
+
+%% Setup workspace and define function
+function in_lookup(j,i,isubj)
+global prm maxprm look
+
+%% Select the channels for this voxel
+[chan_names] = find(look.one_vox_chans);
+n_near = length(chan_names);
+   
+%% Rescale the data to double voxels
+jj=j.*maxprm.kresrat;
+ii=i.*maxprm.kresrat;
+
+%% Geometric model
+if prm.modeltype == 1 
+    
+    %assign chan names
+    look.idw_chan_per_vox(1,1:n_near,jj,ii,isubj)=chan_names;  
+    
+    % give all the channels the same weight
+    look.idw_chan_per_vox(2,1:n_near,jj,ii,isubj)=ones(1,n_near);   
+    
+%% Physical Model
+elseif prm.modeltype == 2 
+    
+    %retreive, scale, and clip weights
+    weights = look.one_vox_weights.*1000000;
+    weights(weights>256.*128-1) = 256.*128-1;
+    weights(weights<-256.*128) = -256.*128;
+    
+    % select the channels for this voxel
+    look.idw_chan_per_vox(1,1:n_near,jj,ii,isubj)=chan_names;
+    
+    % give the channel its weight
+    look.idw_chan_per_vox(2,1:n_near,jj,ii,isubj)=weights(chan_names);   
+end
+
+%% count the channels
+look.n_chan_per_vox(jj,ii,isubj)=n_near;
+
+##### SOURCE END #####
+--></body></html>

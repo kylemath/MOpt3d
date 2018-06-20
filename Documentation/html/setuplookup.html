@@ -1,0 +1,250 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>setuplookup.m -  this subroutine sets up a lookup table for an invididual subject and a particular point</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-06-21"><meta name="DC.source" content="setuplookup.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>setuplookup.m -  this subroutine sets up a lookup table for an invididual subject and a particular point</h1><!--introduction--><pre>Dr. Kyle Mathewson - June 8, 2013 - Translation of Gabriele Gratton's opt3d_fast_v2.f90
+The lookup table indicate if the data point is within the trajectory for a particular channel.
+If yes, the logical variable LOOKUPT of index (ichan) is set to TRUE.  Otherwise, is set to FALSE.
+isubj=subject
+x=coordinates of point in cm
+the set of channels used are stored in the variable look.one_vox_chans</pre><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Setup workspace and reset lookups</a></li><li><a href="#3">Make it faste by exiting if any of a series of boundary conditions realizes</a></li><li><a href="#4">Determine distance from origin of axes -- if it exceeds 11 cm, return (do not plot point)</a></li><li><a href="#5">Compute channels within distance limits</a></li><li><a href="#6">Geometric model</a></li><li><a href="#8">Physical Model</a></li></ul></div><h2>Setup workspace and reset lookups<a name="1"></a></h2><pre class="codeinput"><span class="keyword">function</span> setuplookup(isubj,x)
+</pre><pre class="codeinput"><span class="keyword">global</span> prm loc look
+look.one_vox_chans(1:prm.nch(isubj))=false;
+look.one_vox_weights(1:prm.nch(isubj)) = 0;
+</pre><pre class="codeoutput">Error using setuplookup (line 13)
+Not enough input arguments.
+</pre><h2>Make it faste by exiting if any of a series of boundary conditions realizes<a name="3"></a></h2><pre class="codeinput"><span class="keyword">if</span>  x(1)&lt;-10.95 || (x(1)&gt;7.95  &amp;&amp; x(1)&lt;=12.0)
+    <span class="keyword">return</span>
+<span class="keyword">end</span>
+<span class="keyword">if</span>  x(2)&lt;-10 || (x(2)&gt;10 &amp;&amp; x(2)&lt;=12.0)
+    <span class="keyword">return</span>
+<span class="keyword">end</span>
+<span class="keyword">if</span> x(3)&lt;-10 || (x(3)&gt;10 &amp;&amp; x(3)&lt;=12.0)
+    <span class="keyword">return</span>
+<span class="keyword">end</span>
+</pre><h2>Determine distance from origin of axes -- if it exceeds 11 cm, return (do not plot point)<a name="4"></a></h2><pre class="codeinput">radius = sqrt(sum(x.^2));
+radius(~isreal(radius)) = 0; <span class="comment">%remove negative</span>
+<span class="keyword">if</span> radius&gt;11; <span class="keyword">return</span>; <span class="keyword">end</span>
+</pre><h2>Compute channels within distance limits<a name="5"></a></h2><pre class="codeinput">good_chan = loc.dst(:,isubj) &gt;= prm.dstcrit &amp; loc.dst(:,isubj) &lt; prm.dstcrit2;
+</pre><h2>Geometric model<a name="6"></a></h2><p>This sections implements a simple elliptical model of the light path The trajectory is described as a series of 9 spheres of variable radius whose centers are equally spaced along a semicircle between the source and the detector (the source and detector points are excluded).</p><pre class="codeinput"><span class="keyword">if</span> prm.modeltype == 1
+</pre><pre class="codeinput">    <span class="comment">% Compute distance of each sphere centere to this voxel, for each channel in one big shot</span>
+    dist= sqrt((x(1)-loc.recd(1,:,:,isubj)).^2+(x(2)-loc.recd(2,:,:,isubj)).^2+(x(3)-loc.recd(3,:,:,isubj)).^2);
+    dist(~isreal(dist)) = 0; <span class="comment">%if any negative distances</span>
+
+    <span class="comment">% Check if channel is closer to the sphere center than that spheres size All at once for at least one of the spheres</span>
+    max_dist_diff = squeeze(max(loc.recd(4,:,:,isubj)-dist));
+
+    <span class="comment">% Then set the first level lookuptable logical indicating which channels contribute to this voxel</span>
+    look.one_vox_chans = max_dist_diff&gt;0 &amp; good_chan;
+</pre><h2>Physical Model<a name="8"></a></h2><p>This section of the program implements a more complex model of the effect of tissue transparency on the propagation of light through tissue. simplified to work only for slices</p><pre class="codeinput"><span class="keyword">elseif</span> prm.modeltype == 2
+
+    <span class="comment">% Compute average eccentricity for source and detectors</span>
+    <span class="comment">%estimate depth from surface (using the average source-detector eccen.)</span>
+    z = loc.adst(:,isubj)'-radius;
+
+    <span class="comment">% Compute distance of point from source and detector</span>
+    d1 = sqrt(  (x(1)-loc.sloc(1,:,isubj)).^2 + (x(2)-loc.sloc(2,:,isubj)).^2 + (x(3)-loc.sloc(3,:,isubj)).^2  );
+    d2 = sqrt(  (x(1)-loc.dloc(1,:,isubj)).^2 + (x(2)-loc.dloc(2,:,isubj)).^2 + (x(3)-loc.dloc(3,:,isubj)).^2  );
+    dc = d1+d2;
+
+    <span class="comment">% Compute intensity fluency for this point</span>
+    a = (z.^2).*exp(-prm.optscale.*dc);
+    b = d1.*d1.*d1.*d2.*d2.*d2;
+    c = (prm.optscale.^2).*(d1+.01).*(d2+.01);
+    p = c.*a./b;
+
+    <span class="comment">% Ignore if depth outside range</span>
+    p(z&lt;0.1 | z&gt;5 ) = 0;
+
+    <span class="comment">% Ignore if distance outside range</span>
+    p(d1&gt;8 | d2&gt;8 | dc&gt;12) = 0;
+
+    <span class="comment">% If Phase data</span>
+    <span class="keyword">if</span> prm.idata == 2
+        i = p&gt;.000001;
+
+        <span class="comment">%compute scaling factor due to optical properties of head</span>
+        depth = 0.1+0.5.*sqrt(loc.dst(i,isubj)./prm.optscale);
+
+        <span class="comment">%compute semiperimenter of ellipse to determine average path length (unadjusted)</span>
+        semiper = sqrt(pi.^2.*0.5.*loc.dst(i,isubj).*abs(depth) + 4.*(0.5.*loc.dst(i,isubj)-depth).^2  );
+
+        <span class="comment">%compute phase fluency</span>
+        <span class="keyword">if</span> ~isempty(depth)
+            p(i) = p(i).*(d1(i)+d2(i)-semiper');
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">%Save the channels names and weights if exceeding threshold</span>
+    i = abs(p)&gt;.000001 &amp; good_chan';
+    look.one_vox_chans = i;
+    look.one_vox_weights(i)=p(i);
+
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% setuplookup.m -  this subroutine sets up a lookup table for an invididual subject and a particular point
+%  Dr. Kyle Mathewson - June 8, 2013 - Translation of Gabriele Gratton's opt3d_fast_v2.f90
+%  The lookup table indicate if the data point is within the trajectory for a particular channel.
+%  If yes, the logical variable LOOKUPT of index (ichan) is set to TRUE.  Otherwise, is set to FALSE.
+%  isubj=subject
+%  x=coordinates of point in cm
+%  the set of channels used are stored in the variable look.one_vox_chans
+
+
+%% Setup workspace and reset lookups
+function setuplookup(isubj,x)
+global prm loc look
+look.one_vox_chans(1:prm.nch(isubj))=false;
+look.one_vox_weights(1:prm.nch(isubj)) = 0;
+
+%% Make it faste by exiting if any of a series of boundary conditions realizes
+if  x(1)<-10.95 || (x(1)>7.95  && x(1)<=12.0)
+    return
+end
+if  x(2)<-10 || (x(2)>10 && x(2)<=12.0)
+    return
+end
+if x(3)<-10 || (x(3)>10 && x(3)<=12.0)
+    return
+end
+
+%% Determine distance from origin of axes REPLACE_WITH_DASH_DASH if it exceeds 11 cm, return (do not plot point)
+radius = sqrt(sum(x.^2));
+radius(~isreal(radius)) = 0; %remove negative
+if radius>11; return; end
+
+%% Compute channels within distance limits
+good_chan = loc.dst(:,isubj) >= prm.dstcrit & loc.dst(:,isubj) < prm.dstcrit2; 
+
+%% Geometric model
+% This sections implements a simple elliptical model of the light path
+% The trajectory is described as a series of 9 spheres of variable radius whose centers are equally spaced
+% along a semicircle between the source and the detector (the source and detector points are excluded).
+if prm.modeltype == 1   
+    
+    % Compute distance of each sphere centere to this voxel, for each channel in one big shot
+    dist= sqrt((x(1)-loc.recd(1,:,:,isubj)).^2+(x(2)-loc.recd(2,:,:,isubj)).^2+(x(3)-loc.recd(3,:,:,isubj)).^2);
+    dist(~isreal(dist)) = 0; %if any negative distances
+    
+    % Check if channel is closer to the sphere center than that spheres size All at once for at least one of the spheres
+    max_dist_diff = squeeze(max(loc.recd(4,:,:,isubj)-dist));
+   
+    % Then set the first level lookuptable logical indicating which channels contribute to this voxel
+    look.one_vox_chans = max_dist_diff>0 & good_chan; 
+
+%% Physical Model
+% This section of the program implements a more complex model of the effect of tissue transparency on the propagation of light through tissue.   
+% simplified to work only for slices
+
+elseif prm.modeltype == 2 
+    
+    % Compute average eccentricity for source and detectors
+    %estimate depth from surface (using the average source-detector eccen.)
+    z = loc.adst(:,isubj)'-radius;
+    
+    % Compute distance of point from source and detector
+    d1 = sqrt(  (x(1)-loc.sloc(1,:,isubj)).^2 + (x(2)-loc.sloc(2,:,isubj)).^2 + (x(3)-loc.sloc(3,:,isubj)).^2  );
+    d2 = sqrt(  (x(1)-loc.dloc(1,:,isubj)).^2 + (x(2)-loc.dloc(2,:,isubj)).^2 + (x(3)-loc.dloc(3,:,isubj)).^2  ); 
+    dc = d1+d2;
+    
+    % Compute intensity fluency for this point
+    a = (z.^2).*exp(-prm.optscale.*dc);
+    b = d1.*d1.*d1.*d2.*d2.*d2;
+    c = (prm.optscale.^2).*(d1+.01).*(d2+.01);
+    p = c.*a./b;
+    
+    % Ignore if depth outside range
+    p(z<0.1 | z>5 ) = 0;
+    
+    % Ignore if distance outside range
+    p(d1>8 | d2>8 | dc>12) = 0;    
+    
+    % If Phase data
+    if prm.idata == 2 
+        i = p>.000001;
+        
+        %compute scaling factor due to optical properties of head
+        depth = 0.1+0.5.*sqrt(loc.dst(i,isubj)./prm.optscale);
+        
+        %compute semiperimenter of ellipse to determine average path length (unadjusted)
+        semiper = sqrt(pi.^2.*0.5.*loc.dst(i,isubj).*abs(depth) + 4.*(0.5.*loc.dst(i,isubj)-depth).^2  );  
+        
+        %compute phase fluency
+        if ~isempty(depth)
+            p(i) = p(i).*(d1(i)+d2(i)-semiper');
+        end
+    end   
+    
+    %Save the channels names and weights if exceeding threshold
+    i = abs(p)>.000001 & good_chan';
+    look.one_vox_chans = i;
+    look.one_vox_weights(i)=p(i); 
+    
+end
+
+##### SOURCE END #####
+--></body></html>

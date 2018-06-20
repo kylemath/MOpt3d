@@ -1,0 +1,354 @@
+[Freesurfer] Retinotopy: Group map on fsaverage
+
+Douglas N Greve greve at nmr.mgh.harvard.edu 
+Fri Oct 26 13:20:36 EDT 2012
+Previous message: [Freesurfer] Retinotopy: Group map on fsaverage
+Next message: [Freesurfer] Different steps of RecommendedRecontruction on different operating systems possible?
+Messages sorted by: [ date ] [ thread ] [ subject ] [ author ]
+Search archives:    
+
+On 10/26/2012 05:10 AM, Andreas Schindler wrote:
+> Dear freesurfers
+>
+> Have you ever tried to get an average retinotopic map across all subjects on freesurfer's standard surface (fsaverage)?
+>
+> I obtained an individual map for each subject using the fsfast stream (mkanalysis-sess, selxavg3-sess) and plotted the results using
+> rtview: e.g.
+>
+> rtview.sh --s subj1 --lh --polar --real polar/real.nii.gz --imag polar/imag.nii.gz --fsig polar/fsig.nii.gz
+>
+> Now for the group map, my initial idea was to sample each subject's real and imaginary component to the fsaverage surface and average them separately across subjects.
+> However, I am not sure how I would threshold such an average map on fsaverage using rtview (i.e. what would I use as fsig.nii) given that averaging log p-values
+> is probably not a good idea.
+>
+> Within each subject's rtopy.self.?/polar(or /eccen) folder the following files (and few more but probably not important here) exist:
+>
+> fsig.nii 	->  I understand this contains the unsigned log p values probably obtained via an F-test (frequency of interest) / (noise frequencies)
+> sig.nii		->  this might then be the signed counterpart of fsig.nii	
+> imag.nii 	->  this must contain the imaginary component of the polar angle or eccen map
+> real.nii  	->  this must contain the real component of the polar angle or eccen map
+> mag.nii 	->  I suppose this might contain the amplitude of the signal at the frequency of interest (i.e. the frequency the wedge / ring is traveling)
+>
+>
+> However, I don't quite know what the remaining files are good for
+I've added info below
+> minsig.nii ->  best p-value between real and imaginary as compared to 0/fixation
+> iminsig.nii ->  index of the best p-value (1=real, 2=imag)
+> cwmap-imag.nii ->  not useful, for compatability with tksurfer
+> cwmap-real.nii->  not useful, for compatability with tksurfer
+>
+>
+> ces.nii - two frame file, real and imag
+> cesmag.nii - magnitude
+> cesmagpct.nii - magnitude percent (with respect to voxel mean)
+> cespct.nii - same as ces.nii but percent with respect ot voxel mean
+> cesvar.pct - variance of real, imag (ie, square of the error bars)
+> cesvarpct.nii - variance as a percent of voxel mean^2
+>
+> For the ces* files I understand that they generally contain effect sizes / variances and are used for group analyses.
+> However, I am not quite sure what effects they correspond to in the case of retinotopy.
+>
+> When browsing the web for similar problems I found the following post:
+>
+> 	>  Hi Michelle, try this:
+> 	>
+> 	>  isxconcat-sess -sf sessidlist -a rtopy.fsaverage.lh -call -o retgroup
+> 	>
+> 	>  cd retgroup/rtopy.fsaverage.lh
+> 	>
+> 	>  mri_glmfit --y eccen/ces.000.nii.gz --osgm --o eccen/glm.real --surface
+> 	>  fsaverage lh
+> 	>  mri_glmfit --y eccen/ces.001.nii.gz --osgm --o eccen/glm.imag --surface
+> 	>  fsaverage lh
+> 	>  mri_glmfit --y polar/ces.000.nii.gz --osgm --o polar/glm.real --surface
+> 	>  fsaverage lh
+> 	>  mri_glmfit --y polar/ces.001.nii.gz --osgm --o polar/glm.imag --surface
+> 	>  fsaverage lh
+> 	>
+> 	>  mri_fieldsign --fs lh.fieldsign.mgh \
+> 	>   --eccen eccen/glm.real/osgm/gamma.mgh eccen/glm.imag/osgm/gamma.mgh \
+> 	>   --polar polar/glm.real/osgm/gamma.mgh polar/glm.imag/osgm/gamma.mgh \
+> 	>   --s fsaverage --hemi lh --sphere --old
+> 	>
+> 	>  tksurfer fsaverage lh inflated -aparc -ov lh.fieldsign.mgh -fthresh .5
+>
+> However, as mentioned above I wonder what effect sizes are used here and why (different to rtview) there is no significance map
+> needed to plot the data.
+The above basically does what you suggest above (ie, average the real 
+and imag components across subject). Each of those glmfit commands will 
+produce a sig.mgh file. You can  create a single sig file for use with 
+rtview with a conjunction:
+      mri_concat --conjunct eccen/glm.real/osgm/sig.mgh 
+eccen/glm.imag/osgm/sig.mgh polar/glm.real/osgm/sig.mgh 
+polar/glm.imag/osgm/sig.mgh --o conjunction.sig.mgh
+
+You can then load up the relevant files into rtview
+
+doug
+
+
+>
+> Is there a way to use rtview for the result of a group analysis?
+> And if yes how would I get a fsig.nii file for that?
+>
+> I really appreciate your help!
+>
+> many thanks&  best wishes
+>
+> Andreas
+>
+>
+> _______________________________________________
+> Freesurfer mailing list
+> Freesurfer at nmr.mgh.harvard.edu
+> https://mail.nmr.mgh.harvard.edu/mailman/listinfo/freesurfer
+
+-- 
+Douglas N. Greve, Ph.D.
+MGH-NMR Center
+greve at nmr.mgh.harvard.edu
+Phone Number: 617-724-2358
+Fax: 617-726-7422
+
+Bugs: surfer.nmr.mgh.harvard.edu/fswiki/BugReporting
+FileDrop: www.nmr.mgh.harvard.edu/facility/filedrop/index.html
+
+Previous message: [Freesurfer] Retinotopy: Group map on fsaverage
+Next message: [Freesurfer] Different steps of RecommendedRecontruction on different operating systems possible?
+Messages sorted by: [ date ] [ thread ] [ subject ] [ author ]
+More information about the Freesurfer mailing list
+
+
+[Freesurfer] Group Average of Retinotopy Results
+
+Douglas N Greve greve at nmr.mgh.harvard.edu 
+Wed Oct 19 17:30:42 EDT 2011
+Previous message: [Freesurfer] Group Average of Retinotopy Results
+Next message: [Freesurfer] reg-feat2anat failure
+Messages sorted by: [ date ] [ thread ] [ subject ] [ author ]
+Search archives:    
+Hi Michelle, try this:
+
+isxconcat-sess -sf sessidlist -a rtopy.fsaverage.lh -call -o retgroup
+cd retgroup/rtopy.fsaverage.lh
+
+mri_glmfit --y eccen/ces.000.nii.gz --osgm --o eccen/glm.real --surface 
+fsaverage lh
+mri_glmfit --y eccen/ces.001.nii.gz --osgm --o eccen/glm.imag --surface 
+fsaverage lh
+mri_glmfit --y polar/ces.000.nii.gz --osgm --o polar/glm.real --surface 
+fsaverage lh
+mri_glmfit --y polar/ces.001.nii.gz --osgm --o polar/glm.imag --surface 
+fsaverage lh
+
+mri_fieldsign --fs lh.fieldsign.mgh \
+  --eccen eccen/glm.real/osgm/gamma.mgh eccen/glm.imag/osgm/gamma.mgh \
+  --polar polar/glm.real/osgm/gamma.mgh polar/glm.imag/osgm/gamma.mgh \
+  --s fsaverage --hemi lh --sphere --old
+
+tksurfer fsaverage lh inflated -aparc -ov lh.fieldsign.mgh -fthresh .5
+
+
+
+Michelle Umali wrote:
+> Hi Doug and the Freesurfers,
+> Thanks for your help.  I have 2 questions.:
+>
+> 1) I did the retinotopy analysis on the fsaverage surface as you 
+> suggested below and then ran isxconcat-sess for my eccen and polar data:
+>    e.g. isxconcat-sess -analysis rtopy.fsaverage.lh -contrast polar 
+> -sf sessid -o group_polar_lh
+>     but how do you do this for the fieldsign analysis, since the 
+> cess.nii and other files don't exist?
+>
+> 2) So when trying to run a group mri_glmfit on the polar and eccen 
+> maps with:
+> mri_glmfit --y ces.nii.gz --wls cesvar.nii.gz --osgm --surface 
+> fsaverage lh --glmdir group_eccen_lh.wls --nii.gz
+>
+> I got an error, because I have two ces.nii.gz and cesvar.nii.gz files 
+> each.  I am not sure how this happened.  I only have one run each of 
+> polar and wedge data.  What may have generated these two files and 
+> which one do I use?
+>
+>
+> Thanks.
+> Michelle
+>
+>
+> On Thu, Oct 13, 2011 at 11:36 AM, Douglas N Greve 
+> <greve at nmr.mgh.harvard.edu <mailto:greve at nmr.mgh.harvard.edu>> wrote:
+>
+>     When you run preproc-sess use -surface fsaverage lhrh instead of
+>     -surface self lhrh. Then create a new analysis with the same
+>     parameters, except use -surface fsaverage lh instead of -surface
+>     self lh.
+>     doug
+>
+>     Michelle Umali wrote:
+>
+>         Hi Doug,
+>         I'm a little confused as to how to assign functional data to
+>         the fsaverage space.
+>         1) Do you mean just change each subject's subjectname file to
+>         fsaverage and then do the same thing as before for each person?
+>         2) Also, when I specify the analysis do I change
+>         -rtopy.self.lh to rtopy.fsaverage.lh, i.e. will isconcat later
+>         be sensitive to analysis name?
+>
+>         e.g. mkanalysis-sess -a rtopy.self.lh -surface self lh -TR 2
+>         -retinotopy 48 -paradigm rtopy.par -nskip 4 -fwhm 0 -fsd bold
+>         -force
+>
+>         then the same for selxavg3-sess and fieldsign-sess
+>
+>         and then isxconcat-sess would be:
+>         isxconcat-sess -sf sessid -analysis rtopy.fsaverage.lh -o group_lh
+>
+>
+>         Thanks.
+>         Michelle
+>
+>         On Wed, Oct 12, 2011 at 3:54 PM, Douglas N Greve
+>         <greve at nmr.mgh.harvard.edu <mailto:greve at nmr.mgh.harvard.edu>
+>         <mailto:greve at nmr.mgh.harvard.edu
+>         <mailto:greve at nmr.mgh.harvard.edu>>> wrote:
+>
+>            If you want to combine across subjects, then you need to
+>         run the
+>            analysis on fsaverage (ie, rerun preproc-sess, create a new
+>            analysis, run selxavg3-sess, and then isxconcat-sess).
+>            doug
+>
+>            Michelle Umali wrote:
+>
+>                Dear Freesurfers,
+>                I've generated individual polar, eccentricity, and
+>         fieldsign
+>                maps for each of my subjects. I would like to generate
+>         group
+>                average maps of these that I can visualize on the
+>         fsaverage brain.
+>
+>                When I ran:
+>                isxconcat-sess -sf sessid -analysis rtopy.self.lh -o
+>         group_lh
+>
+>                I got:
+>                ERROR: analysis space is self surface, not supported
+>
+>                How do I do a group average for the 3 different maps?
+>
+>                Thanks.
+>                Michelle
+>
+>                For each person I ran recon-all and flattened occipital
+>         patches.
+>                Then:
+>                mkanalysis-sess -a rtopy.self.lh -surface self lh -TR 2
+>                -retinotopy 48 -paradigm rtopy.par -nskip 4 -fwhm 0
+>         -fsd bold
+>                -force
+>                 mkanalysis-sess -a rtopy.self.rh -surface self rh -TR 2
+>                -retinotopy 48 -paradigm rtopy.par -nskip 4 -fwhm 0
+>         -fsd bold
+>                -force
+>
+>                preproc-sess -surface self lhrh -fwhm 5 -per-run -s
+>         sjXX -fsd
+>                bold -force
+>
+>                selxavg3-sess -a rtopy.self.lh -s sjXX -force
+>                selxavg3-sess -a rtopy.self.rh -s sjXX -force
+>
+>                fieldsign-sess -a rtopy.self.lh -occip -fwhm 20 -s sjXX
+>                fieldsign-sess -a rtopy.self.rh -occip -fwhm 20 -s sjXX
+>
+>              
+>          ------------------------------------------------------------------------
+>
+>                _______________________________________________
+>                Freesurfer mailing list
+>                Freesurfer at nmr.mgh.harvard.edu
+>         <mailto:Freesurfer at nmr.mgh.harvard.edu>
+>                <mailto:Freesurfer at nmr.mgh.harvard.edu
+>         <mailto:Freesurfer at nmr.mgh.harvard.edu>>
+>
+>              
+>          https://mail.nmr.mgh.harvard.edu/mailman/listinfo/freesurfer
+>
+>
+>            --     Douglas N. Greve, Ph.D.
+>            MGH-NMR Center
+>            greve at nmr.mgh.harvard.edu
+>         <mailto:greve at nmr.mgh.harvard.edu>
+>         <mailto:greve at nmr.mgh.harvard.edu
+>         <mailto:greve at nmr.mgh.harvard.edu>>
+>            Phone Number: 617-724-2358 <tel:617-724-2358>
+>         <tel:617-724-2358 <tel:617-724-2358>> Fax: 617-726-7422
+>         <tel:617-726-7422>
+>            <tel:617-726-7422 <tel:617-726-7422>>
+>
+>            Bugs: surfer.nmr.mgh.harvard.edu/fswiki/BugReporting
+>         <http://surfer.nmr.mgh.harvard.edu/fswiki/BugReporting>
+>            <http://surfer.nmr.mgh.harvard.edu/fswiki/BugReporting>
+>            FileDrop:
+>         www.nmr.mgh.harvard.edu/facility/filedrop/index.html
+>         <http://www.nmr.mgh.harvard.edu/facility/filedrop/index.html>
+>            <http://www.nmr.mgh.harvard.edu/facility/filedrop/index.html>
+>
+>
+>
+>
+>            The information in this e-mail is intended only for the
+>         person to
+>            whom it is
+>            addressed. If you believe this e-mail was sent to you in
+>         error and
+>            the e-mail
+>            contains patient information, please contact the Partners
+>            Compliance HelpLine at
+>            http://www.partners.org/complianceline . If the e-mail was
+>         sent to
+>            you in error
+>            but does not contain patient information, please contact the
+>            sender and properly
+>            dispose of the e-mail.
+>
+>
+>
+>     -- 
+>     Douglas N. Greve, Ph.D.
+>     MGH-NMR Center
+>     greve at nmr.mgh.harvard.edu <mailto:greve at nmr.mgh.harvard.edu>
+>     Phone Number: 617-724-2358 <tel:617-724-2358> Fax: 617-726-7422
+>     <tel:617-726-7422>
+>
+>     Bugs: surfer.nmr.mgh.harvard.edu/fswiki/BugReporting
+>     <http://surfer.nmr.mgh.harvard.edu/fswiki/BugReporting>
+>     FileDrop: www.nmr.mgh.harvard.edu/facility/filedrop/index.html
+>     <http://www.nmr.mgh.harvard.edu/facility/filedrop/index.html>
+>
+>
+> ------------------------------------------------------------------------
+>
+> _______________________________________________
+> Freesurfer mailing list
+> Freesurfer at nmr.mgh.harvard.edu
+> https://mail.nmr.mgh.harvard.edu/mailman/listinfo/freesurfer
+
+-- 
+Douglas N. Greve, Ph.D.
+MGH-NMR Center
+greve at nmr.mgh.harvard.edu
+Phone Number: 617-724-2358 
+Fax: 617-726-7422
+
+Bugs: surfer.nmr.mgh.harvard.edu/fswiki/BugReporting
+FileDrop: www.nmr.mgh.harvard.edu/facility/filedrop/index.html
+
+
+Previous message: [Freesurfer] Group Average of Retinotopy Results
+Next message: [Freesurfer] reg-feat2anat failure
+Messages sorted by: [ date ] [ thread ] [ subject ] [ author ]
+More information about the Freesurfer mailing list
