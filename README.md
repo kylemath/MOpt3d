@@ -13,7 +13,7 @@ Translated to matlab based on original fortran 90 code opt3d_fast_v2.f90 by Dr. 
 
 mopt3d.m is a wrapper function that sets the paramaters and calls the fucntions to:
 
-Run the code by running mopt3d in the command line. Change settings inside the mopt3d script. You will at least have to change the experiment name and data path.
+Run the code by running '''mopt3d''' in the command line. Change settings inside the mopt3d script. You will at least have to change the experiment name and data path.
 
 1) Load in location information from .mtg and .rol/.tol files 
  -readloc_new.m - no longer needs a .loc text file, finds files  based on parameters
