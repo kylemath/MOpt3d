@@ -70,10 +70,12 @@ now.date = {'060813';'052013';'121013';'111413';'022514';'101413';'083013';'0610
 % % % now.date = {'123456'}; %tol
 
 %% Analysis Settings
-now.path = ['E:' filesep 'data']; % now.path = ['\\128.174.211.151\data']; %data folder
-prm.istep = 5; %resolution of voxels
-prm.space = 1; %talaraich (tol) = 1; real (rol) = 2; 
-prm.data_type = 2; %1 - ppod .001 unepoched; 2 - avm average files
+% now.path = ['E:' filesep 'data']; %  %data folder
+% now.path = ['\\128.174.211.151\data'];
+now.path = ['/Volumes/Lab_Files/Data/Backup_Illinois']
+prm.istep = 2.5; %resolution of voxels
+prm.space = 2; %talaraich (tol) = 1; real (rol) = 2; 
+prm.data_type = 1; %1 - ppod .001 unepoched; 2 - avm average files
 now.data_fol = 'pc00-00'; %folder that the .001 or .avm files are in
 now.mtg_suf = '_6col'; % abc1234xxxxx.mtg
 now.tol_suf = '_scalp_dig_fid'; % abc1234xxxxx.rol/tol
@@ -99,11 +101,11 @@ anal.saveanal = 0; %1 save analysis, 0 don't save
 prm.nses = 1; %opa = 8, %rop = 1, %emm = 4?, %milk = 1  %can I automate this?
 
 %% Additional settings
-prm.modeltype = 2; %1 - Geometric; 2 - Physical; 3 - Inverse
+prm.modeltype = 1; %1 - Geometric; 2 - Physical; 3 - Inverse
 prm.idata = 2; %type of data, 1 if dc, 2 if phase, 3 if ac 
 prm.kwave = 1; %Wavelength to use (1 = All; 2 = short; 3 = long; 4 = oxy; 5 = deoxy);
-prm.dstcrit = 2.25; %shortest distance channel to consider in cm
-prm.dstcrit2 = 5.0; %longest distance 
+prm.dstcrit = 2.00; %shortest distance channel to consider in cm
+prm.dstcrit2 = 6.0; %longest distance 
 prm.abscoef = .01;
 prm.scatcoef = 1; 
 prm.resol = .8; %path width (in cm);
@@ -116,11 +118,11 @@ prm.dpf = [6.51 5.86]; %Differential path length factor [690 830] per Duncan et 
         
 %% plot settings for coverage/montage viewing
 plot.smooth = 0; %1 if want smoothing; 0 if full resolution brain for plotting %take this out now that we downsample brain to do this part
-plot.banan = 0; %bananas for subjects
-plot.scalp = 0; %plot scalp for subjects
+plot.banan = 1; %bananas for subjects
+plot.scalp = 1; %plot scalp for subjects
 plot.brain = 1;  %plot brain for subjects
 plot.isect = 1;  %plot banana+brain intersection for each subject
-plot.sourcedet = 0; %plot sources and detectors for subjects
+plot.sourcedet = 1; %plot sources and detectors for subjects
 plot.savemean = 0;  %save a mean bananas over subjects brik, 1 yes 0 no
 plot.meansum = 1; %1 = plot mean bananas over subjects; 2 = plot sum of bananas over subjects
 plot.brainres = 2.5; %resolution of plotting brain %need to add functionality

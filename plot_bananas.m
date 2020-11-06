@@ -24,7 +24,7 @@ for i_sub = 1:prm.nsubj
     %% bananas
     if plot.banan    
         ba = patch(isosurface(abs(img_banan),.5));
-        alpha(ba,.1);
+        alpha(ba,.4);
         set(ba,'FaceColor',[.2 1 .2],'EdgeColor','none'); 
         isonormals(img_banan,ba);
     end
@@ -36,10 +36,10 @@ for i_sub = 1:prm.nsubj
         elseif prm.space == 1
             sc = patch(isosurface(img_scalp));
         end
-        alpha(sc,.05);
+        alpha(sc,.2);
 %         isonormals(img_scalp,sc);  
         set(sc,'SpecularStrength',.01);   
-        set(sc,'FaceColor',[1 .9 .9],'EdgeColor','none');
+        set(sc,'FaceColor',[1 .8 .8],'EdgeColor','none');
     end
     
 %     %% brain    
@@ -96,7 +96,7 @@ for i_sub = 1:prm.nsubj
     view(90,0);
 
 end
-subplot(fsize,fsize,prm.nsubj+1);  axis off; cb = colorbar;
+subplot(fsize,fsize,prm.nsubj);  axis off; cb = colorbar;
 if prm.modeltype == 1 %geometric            
     set(gca,'CLim',[0 25]);
     if plot.meansum == 1
