@@ -9,7 +9,7 @@ fsize = ceil(sqrt(prm.nsubj));
 for i_sub = 1:prm.nsubj
     
     %%load individual anatomy
-    load_anat
+    load_anat2
 
     %% load Data  
     if anal.slow_fast == 1 %slow
