@@ -64,7 +64,7 @@ for i_sub=1:prm.nsubj %for each subject
 %     i_direct=fgetl(fid_loc);
 %     fname_mtg=fgetl(fid_loc);  %edited 3/2014 to get rid of loc file
     fname_mtg = [now.path filesep now.exp filesep 'reg' filesep now.exp now.sub{i_sub} now.mtg_suf '.mtg'];
-    
+    fprintf(fname_mtg)
     % read montage file
     fid_mtg = fopen(fname_mtg,'r');
     mtglabel=fgetl(fid_mtg);
