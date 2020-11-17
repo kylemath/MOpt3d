@@ -7,8 +7,7 @@ global prm now anal plot
 prm.nsubj = app.nsubj; 
 now.exp = app.exp;
 now.sub = app.sub;
-now.sub
-now.date = app.date
+now.date = app.date;
 now.path = app.path;
 prm.istep = app.istep;
 prm.space = app.space;
@@ -17,7 +16,7 @@ now.data_fol = app.data_fol;
 now.mtg_suf = app.mtg_suf;
 now.tol_suf = app.tol_suf;
 anal.compute_blocks = app.compute_blocks;
-anal.freq_spin = app.freq_spin;
+anal.freq_spin = str2num(app.freq_spin); %since it is a fraction
 anal.freq_flash = app.freq_flash;
 anal.wave_num = app.wave_num;
 anal.slow_or_fast = app.slow_or_fast;
@@ -43,6 +42,7 @@ prm.epsihbo2= app.epsihbo2;
 prm.epsihbo1= app.epsihbo1;
 prm.epsihb2= app.epsihb2;
 prm.epsihb1= app.epsihb1;
+prm.dpf = [app.dpf1 app.dpf2]; %had to enter separately
 plot.smooth = app.plot_smooth;
 plot.banan = app.banan;
 plot.scalp = app.scalp;
